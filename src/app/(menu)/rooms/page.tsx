@@ -66,7 +66,7 @@ export default function Rooms() {
         </div>
       </div>
       <Table>
-        <TableCaption>Danh sách phòng trong ký túc xá.</TableCaption>
+        <TableCaption>Danh sách phòng ký túc xá.</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>ID Phòng</TableHead>

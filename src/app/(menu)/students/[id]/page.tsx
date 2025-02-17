@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 
 export default function StudentDetail() {
   const router = useRouter();
-  const params = useParams(); // ✅ Dùng useParams để lấy params
+  const params = useParams(); //Dùng useParams để lấy params
   const [student, setStudent] = useState<Student | null>(null);
   const [loading, setLoading] = useState(true);
 

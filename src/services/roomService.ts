@@ -29,4 +29,21 @@ export const getRooms = async (): Promise<Room[]> => {
   }
 };
 
+// Hàm lấy phòng theo ID
+export const getRoomById = async (roomId: string): Promise<Room | null> => {
+  try {
+    const response = await fetch(`${API_URL}/${roomId}`);
+
+    if (!response.ok) {
+      throw new Error("Lỗi khi lấy dữ liệu phòng");
+    }
+
+    const roomData = await response.json();
+    return roomData;
+  } catch (error) {
+    console.error("Lỗi khi fetch dữ liệu phòng:", error);
+    return null;
+  }
+};
+
 
