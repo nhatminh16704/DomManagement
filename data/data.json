@@ -80,6 +80,85 @@
       "password": "654321",
       "role": "student"
     }
+  ],
+  "blocks": [
+    {
+      "id": "A",
+      "type": "Nam",
+      "room_count": 10
+    },
+    {
+      "id": "J",
+      "type": "Nữ",
+      "room_count": 8
+    },
+    {
+      "id": "B",
+      "type": "Nam",
+      "room_count": 12
+    }
+  ],
+  "type_room": [
+    {
+      "id": "1",
+      "name": "Thường"
+    },
+    {
+      "id": "2",
+      "name": "Dịch vụ"
+    }
+  ],
+  "rooms": [
+    {
+      "id": "A1",
+      "block_id": "A",
+      "type": "Thường",
+      "price": 250000,
+      "occupancy": 1,
+      "available_beds": 3
+    },
+    {
+      "id": "A2",
+      "block_id": "A",
+      "type": "Dịch vụ",
+      "price": 300000,
+      "occupancy": 0,
+      "available_beds": 4
+    },
+    {
+      "id": "J1",
+      "block_id": "J",
+      "type": "Thường",
+      "price": 220000,
+      "occupancy": 2,
+      "available_beds": 2
+    },
+    {
+      "id": "J2",
+      "block_id": "J",
+      "type": "Thường",
+      "price": 230000,
+      "occupancy": 1,
+      "available_beds": 3
+    },
+    {
+      "id": "B1",
+      "block_id": "B",
+      "type": "Dịch vụ",
+      "price": 500000,
+      "occupancy": 0,
+      "available_beds": 4
+    },
+    {
+      "id": "B2",
+      "block_id": "B",
+      "type": "Thường",
+      "price": 270000,
+      "occupancy": 3,
+      "available_beds": 1
+    }
   ]
+  
+  
   
 }

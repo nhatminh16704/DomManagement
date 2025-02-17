@@ -70,7 +70,7 @@ export default function LoginForm() {
 
   return (
     <div className="flex min-h-screen items-center justify-center">
-      <div className="w-full max-w-md space-y-8 p-8 border rounded-lg shadow-lg">
+      <div className="w-full max-w-md space-y-8 p-8 border rounded-lg shadow-[0_0_15px_rgba(0,0,0,0.1)] shadow-t-lg shadow-l-lg shadow-r-lg">
         <h2 className="text-2xl font-bold text-center mb-8">Đăng nhập</h2>
         {error && <p className="text-red-500 text-center">{error}</p>}
         <Form {...form}>
