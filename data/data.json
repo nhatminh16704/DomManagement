@@ -1,0 +1,85 @@
+{
+  "students": [
+    {
+      "id": 1,
+      "student_code": "N22DCCN001",
+      "first_name": "Nguyễn Văn",
+      "name": "A",
+      "birthday": "14/05/2002",
+      "gender": "Nam",
+      "class": "CNTT-K22",
+      "phone_number": "0987654321",
+      "email": "nguyenvana@example.com",
+      "hometown": "Hà Nội"
+    },
+    {
+      "id": 2,
+      "student_code": "N21QTKD002",
+      "first_name": "Trần Thị",
+      "name": "B",
+      "birthday": "22/09/2001",
+      "gender": "Nữ",
+      "class": "QTKD-K21",
+      "phone_number": "0912345678",
+      "email": "tranthib@example.com",
+      "hometown": "TP. Hồ Chí Minh"
+    },
+    {
+      "id": 3,
+      "student_code": "N23KT003",
+      "first_name": "Lê Minh",
+      "name": "C",
+      "birthday": "19/07/2003",
+      "gender": "Nam",
+      "class": "KT-K23",
+      "phone_number": "0978123456",
+      "email": "leminhc@example.com",
+      "hometown": "Đà Nẵng"
+    },
+    {
+      "id": 4,
+      "student_code": "N20ATTT004",
+      "first_name": "Phạm Thảo",
+      "name": "D",
+      "birthday": "01/12/2000",
+      "gender": "Nữ",
+      "class": "ATTT-K20",
+      "phone_number": "0909998887",
+      "email": "phamthaod@example.com",
+      "hometown": "Cần Thơ"
+    },
+    {
+      "id": 5,
+      "student_code": "N22CNTT005",
+      "first_name": "Hoàng Anh",
+      "name": "E",
+      "birthday": "25/03/2002",
+      "gender": "Nam",
+      "class": "CNTT-K22",
+      "phone_number": "0934567890",
+      "email": "hoanganhe@example.com",
+      "hometown": "Hải Phòng"
+    }
+  ],
+  "accounts": [
+    {
+      "id": 1,
+      "username": "admin",
+      "password": "admin123",
+      "role": "admin"
+    },
+    {
+      "id": 2,
+      "username": "N22DCCN001",
+      "password": "123456",
+      "role": "student"
+    },
+    {
+      "id": 3,
+      "username": "N21QTKD002",
+      "password": "654321",
+      "role": "student"
+    }
+  ]
+  
+}
