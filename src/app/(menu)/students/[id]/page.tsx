@@ -32,12 +32,12 @@ export default function StudentDetail() {
     <div className="p-6">
       <h1 className="text-2xl font-bold mb-4">Thông tin sinh viên</h1>
       <div className="border p-4 rounded-lg shadow-md bg-white">
-        <p><strong>Mã sinh viên:</strong> {student?.student_code}</p>
-        <p><strong>Họ và Tên:</strong> {student?.first_name} {student?.name}</p>
+        <p><strong>Mã sinh viên:</strong> {student?.studentId}</p>
+        <p><strong>Họ và Tên:</strong> {student?.firstName} {student?.lastName}</p>
         <p><strong>Ngày sinh:</strong> {student?.birthday}</p>
         <p><strong>Giới tính:</strong> {student?.gender}</p>
-        <p><strong>Lớp:</strong> {student?.class}</p>
-        <p><strong>Số điện thoại:</strong> {student?.phone_number}</p>
+        <p><strong>Lớp:</strong> {student?.className}</p>
+        <p><strong>Số điện thoại:</strong> {student?.phoneNumber}</p>
         <p><strong>Email:</strong> {student?.email}</p>
         <p><strong>Quê quán:</strong> {student?.hometown}</p>
       </div>
