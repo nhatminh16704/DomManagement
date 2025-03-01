@@ -46,4 +46,3 @@ export const getRoomById = async (roomId: string): Promise<Room | null> => {
   }
 };
 
-
