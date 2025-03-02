@@ -38,8 +38,8 @@ export default function Announcements() {
     }, [])
 
   const navigateToDetailPage = (notificationId: number) => {
-    const url=`/notification/${notificationId}`;
-    router.push(url);
+    const url=`/announcements/${notificationId}`;
+    router.push(`/announcements/${notificationId}`);
   };
 
   const onclickall = ()=> {
@@ -108,7 +108,7 @@ export default function Announcements() {
             className="flex justify-between items-center border-b border-gray-600 pb-2"
             onClick={() => navigateToDetailPage(item.id)}
           >
-            <span className="text-blue-400">▶ {item.title + item.id.toString()}</span>
+            <span className="text-blue-400">▶ {item.title}</span>
             <span className="text-sm text-gray-400">{item.created_date.toLocaleDateString()}</span>
           </li>
         ))}

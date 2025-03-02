@@ -3,6 +3,7 @@ import React from 'react'
 import { useEffect, useState } from 'react'
 import { useRouter,useParams } from "next/navigation"
 import { getnotificationId, notification } from '@/services/notificationService';
+import { Button } from '@/components/ui/button';
 
 
 export default function AnnouncementsDetail() {
@@ -10,6 +11,7 @@ export default function AnnouncementsDetail() {
   const { id } = useParams();
   const [notifications, setnotification] = useState<notification|null>();
   const [loading, setLoading] = useState(true);
+  
   useEffect(() => {
     const notificationId = Number(id); 
     if (isNaN(notificationId)) return;
@@ -29,9 +31,16 @@ export default function AnnouncementsDetail() {
   }
   return (
     <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4"> {notifications?.title} </h1>
-      <p>{notifications?.content}</p>
-      <p>{notifications?.created_date.toDateString()}</p>
+      <h1 className="text-2xl font-bold mb-4">{notifications?.title}</h1>
+      
+        <p> {notifications?.content}</p>
+        <p><strong>Ngày tạo: </strong>{notifications?.created_date
+        ? new Date(notifications.created_date).toLocaleDateString("vi-VN")
+        : "Không có ngày"}
+        </p>
+      <Button className="mt-4 bg-blue-500" onClick={() => router.back()}>
+        Quay lại
+      </Button>
     </div>
   )
 }
