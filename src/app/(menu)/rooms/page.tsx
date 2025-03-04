@@ -11,6 +11,15 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { getRooms, Room } from "@/services/roomService";
@@ -19,34 +28,56 @@ export default function Rooms() {
   const router = useRouter();
   const [rooms, setRooms] = useState<Room[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-
-  // Fetch danh sách phòng
-  useEffect(() => {
-    getRooms()
-      .then((data) => {
-        setRooms(data); // Cập nhật state rooms với dữ liệu từ API
-      })
-      .catch((err) => {
-        console.error("Lỗi khi lấy danh sách phòng:", err); // Hiển thị lỗi nếu có
-      });
-  }, []);
-
-  const navigateToDetailPage = (roomId: string) => {
-    // Sử dụng useRouter để chuyển hướng đến trang chi tiết phòng
-    const roomDetailUrl = `/rooms/${roomId}`;
-
-    // Chuyển đến trang có đường dẫn `/rooms/{room_id}`
-    router.push(roomDetailUrl);
-  };
+  const [currentPage, setCurrentPage] = useState(1); // State cho trang hiện tại
+  const roomsPerPage = 8; // Số sinh viên mỗi trang
 
   const filteredRooms = rooms.filter((room) => {
     // Kiểm tra xem room_id có chứa từ khóa tìm kiếm không
-    const normalizedRoomId = room.id.toLowerCase();
+    const normalizedRoomId = room.roomId.toLowerCase();
     const normalizedSearchTerm = searchTerm.toLowerCase();
 
     // Kiểm tra xem room_id có chứa từ khóa tìm kiếm không
     return normalizedRoomId.includes(normalizedSearchTerm);
   });
+  // Tính toán phân trang
+  const indexOfLastRoom = currentPage * roomsPerPage;
+  const indexOfFirstRoom = indexOfLastRoom - roomsPerPage;
+  const currentRooms = filteredRooms.slice(indexOfFirstRoom, indexOfLastRoom);
+  const totalPages = Math.ceil(filteredRooms.length / roomsPerPage);
+
+  // Tạo mảng số trang
+  const pageNumbers = Array.from({ length: Math.min(totalPages, 3) }, (_, i) =>
+    currentPage > 2 && totalPages > 3 ? currentPage - 1 + i : i + 1
+  );
+
+  // Reset về trang 1 khi searchTerm thay đổi
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
+  // Hàm chuyển trang
+  const nextPage = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+  const prevPage = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  // Fetch danh sách phòng
+  useEffect(() => {
+    getRooms()
+      .then((data) => {
+        setRooms(data);
+      })
+      .catch((err) => {
+        console.error("Lỗi khi lấy danh sách phòng:", err);
+      });
+  }, []);
+
+  const navigateToDetailPage = (roomId: string) => {
+    const roomDetailUrl = `/rooms/${roomId}`;
+    router.push(roomDetailUrl);
+  };
 
   return (
     <div>
@@ -72,24 +103,24 @@ export default function Rooms() {
             <TableHead>ID Phòng</TableHead>
             <TableHead>Loại phòng</TableHead>
             <TableHead>Giá phòng</TableHead>
-            <TableHead>Số người ở</TableHead>
+            <TableHead>Tổng số giường</TableHead>
             <TableHead>Giường còn trống</TableHead>
             <TableHead>Hành động</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
-          {filteredRooms.map((room) => (
-            <TableRow key={room.id}>
-              <TableCell>{room.id}</TableCell>
-              <TableCell>{room.type}</TableCell>
+          {currentRooms.map((room) => (
+            <TableRow key={room.roomId}>
+              <TableCell>{room.roomId}</TableCell>
+              <TableCell>{room.typeRoom}</TableCell>
               <TableCell>{room.price}</TableCell>
-              <TableCell>{room.occupancy}</TableCell>
-              <TableCell>{room.available_beds}</TableCell>
+              <TableCell>{room.totalBeds}</TableCell>
+              <TableCell>{room.availableBeds}</TableCell>
               <TableCell>
                 <Button
                   size="sm"
                   className="mr-2 bg-blue-500"
-                  onClick={() => navigateToDetailPage(room.id)}
+                  onClick={() => navigateToDetailPage(room.roomId)}
                 >
                   Xem
                 </Button>
@@ -98,6 +129,57 @@ export default function Rooms() {
           ))}
         </TableBody>
       </Table>
+
+      {/* Nút phân trang với Pagination */}
+      <div className="flex justify-between items-center mt-4">
+        <Pagination>
+          <PaginationContent>
+            <PaginationItem>
+              <PaginationPrevious
+                onClick={prevPage}
+                className={`
+              hover:bg-blue-500 hover:text-white transition-colors 
+              ${
+                currentPage === 1
+                  ? "pointer-events-none opacity-50"
+                  : "cursor-pointer"
+              }
+              `}
+              />
+            </PaginationItem>
+            {pageNumbers.map((number) => (
+              <PaginationItem key={number}>
+                <PaginationLink
+                  onClick={() => setCurrentPage(number)}
+                  isActive={currentPage === number}
+                  className="cursor-pointer hover:bg-blue-500 hover:text-white transition-colors"
+                >
+                  {number}
+                </PaginationLink>
+              </PaginationItem>
+            ))}
+            {/*Hiển thị dấu ... nếu totalPages > 3 và currentPage < totalPages - 1 */}
+            {totalPages > 3 && currentPage < totalPages - 1 && (
+              <PaginationItem>
+                <PaginationEllipsis />
+              </PaginationItem>
+            )}
+            <PaginationItem>
+              <PaginationNext
+                onClick={nextPage}
+                className={`
+                  hover:bg-blue-500 hover:text-white transition-colors 
+                  ${
+                    currentPage === totalPages
+                      ? "pointer-events-none opacity-50"
+                      : "cursor-pointer"
+                  }
+                  `}
+              />
+            </PaginationItem>
+          </PaginationContent>
+        </Pagination>
+      </div>
     </div>
   );
 }
