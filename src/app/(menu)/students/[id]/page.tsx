@@ -29,7 +29,7 @@ export default function StudentDetail() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-[#F7F8FA]">
       <h1 className="text-2xl font-bold mb-4">Thông tin sinh viên</h1>
       <div className="border p-4 rounded-lg shadow-md bg-white">
         <p><strong>Mã sinh viên:</strong> {student?.studentId}</p>

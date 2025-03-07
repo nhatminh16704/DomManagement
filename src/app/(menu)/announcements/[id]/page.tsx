@@ -30,7 +30,7 @@ export default function AnnouncementsDetail() {
     return <p>Đang tải dữ liệu...</p>;
   }
   return (
-    <div className="p-6">
+    <div className="p-6 bg-[#F7F8FA]">
       <h1 className="text-2xl font-bold mb-4">{notifications?.title}</h1>
       
         <p> {notifications?.content}</p>
@@ -38,6 +38,7 @@ export default function AnnouncementsDetail() {
         ? new Date(notifications.created_date).toLocaleDateString("vi-VN")
         : "Không có ngày"}
         </p>
+        <p><strong>Người viết: </strong>{notifications?.account_id}</p>
       <Button className="mt-4 bg-blue-500" onClick={() => router.back()}>
         Quay lại
       </Button>

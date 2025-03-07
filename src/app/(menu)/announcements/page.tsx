@@ -5,14 +5,13 @@ import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Select from "react-select";
 import { getnotification, getnotificationtype, notification } from '@/services/notificationService';
-import { getTypeNotification, typenotification } from '@/services/typenotification';
 
 export default function Announcements() {
   const router=useRouter();
   const [notifications, setnotification] = useState<notification[]>([]);
-  const [typenotification,settypenotification ] = useState<typenotification[]>([]);
-  const [searchTerm, setSearchTerm] = useState("");
-  const [selected, setSelected] = useState<typenotification | null>(null);
+  const typeNotification: string[] = ["Thông báo 1", "Thông báo 2", "Thông báo 3"];
+  const [selected, setSelected] = useState<String>("");
+  const [selectKey, setSelectKey] = useState(0); 
 
   useEffect(() => {
     getnotification().then((data) => {
@@ -27,25 +26,21 @@ export default function Announcements() {
     });
   }, []);
 
-  useEffect(() => {
-      getTypeNotification()
-        .then((data) => {
-          settypenotification(data); // Cập nhật state rooms với dữ liệu từ API
-        })
-        .catch((err) => {
-          console.error("Lỗi khi lấy danh sách phòng:", err); // Hiển thị lỗi nếu có
-        });
-    }, [])
-
   const navigateToDetailPage = (notificationId: number) => {
     const url=`/announcements/${notificationId}`;
-    router.push(`/announcements/${notificationId}`);
+    router.push(url);
+  };
+
+  const navigateToAddPage = () => {
+    // const url=`/addanouncement/`;
+    // router.push(url);
+    router.push("/addannouncement");
   };
 
   const onclickall = ()=> {
-      setSelected(null);
+      setSelected("");
+      setSelectKey((prev) => prev + 1);
       getnotification().then((data) => {
-        // Chuyển đổi created_date thành Date
         const formattedData = data.map((item) => ({
           ...item,
           created_date: new Date(item.created_date),
@@ -56,7 +51,7 @@ export default function Announcements() {
       });
   }
   
-  const selecttypenotification = (type: number) => {
+  const selecttypenotification = (type: string) => {
     getnotificationtype(type).then((data) => {
       const formattedData = data.map((item) => ({
         ...item,
@@ -71,10 +66,17 @@ export default function Announcements() {
   
 
   return (
-    <div className="flex flex-col h-full">
+    <div className="flex flex-col h-full bg-[#F7F8FA]">
       <div className="flex justify-between items-center mb-5">
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">Notification</h1>
-        <div className="hidden md:flex items-center gap-2 text-sm     rounded-full ring-gray-300 px-2">
+        <div className="hidden md:flex items-center gap-2 text-sm rounded-full ring-gray-300 px-2">
+          <Button 
+            size="lg" 
+            className="bg-blue-500"
+            onClick={navigateToAddPage}
+            >
+            Add Notification
+          </Button>
           <Button 
             size="lg" 
             className="bg-blue-500"
@@ -84,20 +86,20 @@ export default function Announcements() {
           </Button>
       
           <Select
+            key={selectKey}
             className="w-64"
-            options={typenotification.map(item => ({ value: item.id, label: item.name }))}
+            options={typeNotification.map((item) => ({ value: item, label: item }))}
             placeholder="Chọn loại thông báo"
             onChange={(selectedOption) => {
               if (selectedOption) {
-                setSelected({ id: selectedOption.value, name: selectedOption.label });
-                selecttypenotification(selectedOption.value); // Gọi API lấy thông báo theo type
+                setSelected(selectedOption.value);
+                selecttypenotification(selectedOption.value); 
               } else {
-                setSelected(null);
-                onclickall(); // Hiển thị lại tất cả thông báo
+                setSelected("");
               }
             }}
-            />
-            {selected && <p className="text-gray-700">Đã chọn: {selected.name}</p>}
+          />
+            {selected && <p className="text-gray-700">Đã chọn: {selected}</p>}
 
         </div>
       </div>

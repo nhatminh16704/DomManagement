@@ -29,14 +29,14 @@ export default function RoomDetail() {
   }
 
   return (
-    <div className="p-6">
+    <div className="p-6 bg-[#F7F8FA]">
       <h1 className="text-2xl font-bold mb-4">Thông tin phòng</h1>
       <div className="border p-4 rounded-lg shadow-md bg-white">
-        <p><strong>ID Phòng:</strong> {room?.id}</p>
-        <p><strong>Loại phòng:</strong> {room?.type}</p>
+        <p><strong>ID Phòng:</strong> {room?.roomId}</p>
+        <p><strong>Loại phòng:</strong> {room?.blockType}</p>
         <p><strong>Giá phòng:</strong> {room?.price}</p>
-        <p><strong>Số người ở:</strong> {room?.occupancy}</p>
-        <p><strong>Giường còn trống:</strong> {room?.available_beds}</p>
+        <p><strong>Số người ở:</strong> {room?.totalBeds}</p>
+        <p><strong>Giường còn trống:</strong> {room?.availableBeds}</p>
       </div>
       <Button className="mt-4 bg-blue-500" onClick={() => router.back()}>
         Quay lại
