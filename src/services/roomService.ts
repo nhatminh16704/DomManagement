@@ -15,8 +15,15 @@ export interface Room {
 // Hàm lấy dữ liệu phòng từ API
 export const getRooms = async (): Promise<Room[]> => {
   try {
+    // Get token from localStorage
+    const token = localStorage.getItem('token');
+  
 
-    const response = await fetch(API_URL + "/findAll");
+    const response = await fetch(API_URL + "/findAll", {
+      headers : {
+        'Authorization': `Bearer ${token}`
+      }
+    });
 
     if (!response.ok) {
       throw new Error("Lỗi khi lấy dữ liệu phòng");
@@ -33,7 +40,20 @@ export const getRooms = async (): Promise<Room[]> => {
 // Hàm lấy phòng theo ID
 export const getRoomById = async (roomId: string): Promise<Room | null> => {
   try {
-    const response = await fetch(`${API_URL}/${roomId}`);
+    // Get token from localStorage
+    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+    
+    const response = await fetch(`${API_URL}/${roomId}`, {
+      headers
+    });
 
     if (!response.ok) {
       throw new Error("Lỗi khi lấy dữ liệu phòng");

@@ -1,6 +1,6 @@
 export type Student = {
   id: number;
-  studentId: string;
+  studentCode: string;
   firstName: string;
   lastName: string;
   birthday: string;
@@ -18,7 +18,12 @@ const API_URL = process.env.NEXT_PUBLIC_API_URL + "/students";
 // Lấy danh sách sinh viên
 export async function getStudents(): Promise<Student[]> {
   try {
-    const response = await fetch(API_URL + "/findAll");
+    const token = localStorage.getItem('token');
+    const response = await fetch(API_URL + "/findAll", {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     if (!response.ok) {
       throw new Error("Lỗi khi lấy danh sách sinh viên");
     }
@@ -64,7 +69,7 @@ export async function addStudent(student: Student): Promise<Student> {
 // Cập nhật sinh viên
 export async function updateStudent(student: Student): Promise<Student> {
   try {
-    const response = await fetch(`${API_URL}/${student.studentId}`, {
+    const response = await fetch(`${API_URL}/${student.studentCode}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(student),

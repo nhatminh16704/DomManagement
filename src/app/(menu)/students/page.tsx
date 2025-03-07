@@ -66,7 +66,7 @@ export default function Students() {
   const filteredStudents = students.filter((student) => {
     const fullName = `${student.firstName} ${student.lastName}`;
     const normalizedFullName = fullName.toLowerCase();
-    const normalizedStudentId = student.studentId.toLowerCase();
+    const normalizedStudentId = student.studentCode.toLowerCase();
     const normalizedSearchTerm = searchTerm.toLowerCase();
     
     return (
@@ -135,8 +135,8 @@ export default function Students() {
         </TableHeader>
         <TableBody>
           {currentStudents.map((student) => (
-            <TableRow key={student.studentId}>
-              <TableCell>{student.studentId}</TableCell>
+            <TableRow key={student.studentCode}>
+              <TableCell>{student.studentCode}</TableCell>
               <TableCell>
                 {student.firstName} {student.lastName}
               </TableCell>

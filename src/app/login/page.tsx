@@ -16,6 +16,9 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { useState } from "react";
+import authService from "@/services/authService";
+
+
 
 const formSchema = z.object({
   account: z.string().min(5, {
@@ -39,31 +42,25 @@ export default function LoginForm() {
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    const { account, password } = values;
-    const apiUrl = `http://localhost:3001/accounts?username=${account}&password=${password}`;
-  
+
     try {
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-  
-      if (data.length === 0) {
-        setError("Sai tài khoản hoặc mật khẩu!");
-        return;
-      }
-  
-      const user = data[0];
-  
-      // Lưu thông tin đăng nhập vào localStorage
-      localStorage.setItem("user", JSON.stringify(user));
-  
-      // Chuyển hướng tùy theo vai trò
-      if (user.role === "admin") {
-        router.push("/");
+      // Tạo object credentials từ dữ liệu form
+      const credentials = {
+        username: values.account,
+        password: values.password,
+      };
+
+      // Gọi AuthService để đăng nhập
+      await authService.login(credentials);
+
+      router.push("/");
+
+    } catch (err: Error | unknown) {
+      if (err instanceof Error) {
+        setError(err.message);
       } else {
-        router.push("/");
+        setError("Đăng nhập thất bại!");
       }
-    } catch (err) {
-      setError(`Lỗi kết nối đến server! ${err}`);
     }
   }
   

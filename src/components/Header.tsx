@@ -4,7 +4,7 @@ import Image from "next/image";
 
 const Header = () => {
   return (
-    <div className="flex shadow-md">
+    <div className="flex shadow-md bg-[#F7F8FA]">
       <div className="w-[14%] md:w-[8%] lg:w-[16%] xl:w-[14%] p-4">
         <Link
           href="/"
@@ -14,7 +14,7 @@ const Header = () => {
           <span className="hidden lg:block font-bold">DomHub</span>
         </Link>
       </div>
-      <div className="w-[86%] md:w-[92%] lg:w-[84%] xl:w-[86%] bg-[#F7F8FA] flex flex-col">
+      <div className="w-[86%] md:w-[92%] lg:w-[84%] xl:w-[86%]  flex flex-col">
         <div className="flex items-center justify-between p-4">
           <div className="hidden md:flex items-center gap-2  rounded-full ring-[1.5px] ring-gray-300 px-2">
             <Image src="/search.png" alt="" width={16} height={16} />
