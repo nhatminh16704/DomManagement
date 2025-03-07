@@ -157,8 +157,31 @@
       "occupancy": 3,
       "available_beds": 1
     }
+  ],
+  "notification": [
+    {
+      "id": 1,
+      "title": "Thông báo V/v: Thu học phí Học kỳ 2 năm học 2024-2025 đối với sinh viên hệ Đại học chính quy",
+      "content": "Nội dung thông báo 1",
+      "created_date": "2024-02-27T08:00:00.000Z",
+      "type": 2
+    },
+    {
+      "id": 2,
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "type": 1
+    }
+  ],
+  "typenotification": [
+    { "id": 1,
+     "name": "Thông báo hệ thống"
+    },
+    { "id": 2,
+     "name": "Thông báo cập nhật" 
+    }
   ]
-  
   
   
 }
