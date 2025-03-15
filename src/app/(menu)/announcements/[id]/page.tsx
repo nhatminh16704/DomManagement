@@ -32,7 +32,6 @@ export default function AnnouncementsDetail() {
   return (
     <div className="p-6 bg-[#F7F8FA]">
       <h1 className="text-2xl font-bold mb-4">{notifications?.title}</h1>
-      
         <p> {notifications?.content}</p>
         <p><strong>Ngày tạo: </strong>{notifications?.created_date
         ? new Date(notifications.created_date).toLocaleDateString("vi-VN")

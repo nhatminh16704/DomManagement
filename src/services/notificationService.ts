@@ -4,10 +4,11 @@ import { number } from "zod";
 const API_URL = "http://localhost:3001/notification";
 export type notification = {
     id: number;
-    title: String;
-    content: String;
+    title: string;
+    content: string;
     created_date: Date;
-    type: number;
+    account_id: number;
+    type: string;
 }
 export const getnotification = async (): Promise<notification[]> => {
     try{
@@ -22,11 +23,10 @@ export const getnotification = async (): Promise<notification[]> => {
     }catch(error){
         console.error("Lỗi khi fetch dữ liệu thông báo : ",error);
         return [];
-
     }
 }
 
-export const getnotificationtype = async(type:number): Promise<notification[]> =>{
+export const getnotificationtype = async(type:string): Promise<notification[]> =>{
     try{
         const response = await fetch(`${API_URL}?type=${type}`);
     if(!response.ok){
@@ -39,20 +39,20 @@ export const getnotificationtype = async(type:number): Promise<notification[]> =
         return [];
     }
 }
-export const getnotificationId = async(id: number): Promise<notification | null> =>{
-    try{
-        const response = await fetch(`${API_URL}/${id}`);
-        if(!response.ok){
-            throw new Error("lỗi lấy dữ liệu thông báo");
-        }
-        const notificationdata = await response.json();
-        return notificationdata;
+    export const getnotificationId = async(id: number): Promise<notification | null> =>{
+        try{
+            const response = await fetch(`${API_URL}/${id}`);
+            if(!response.ok){
+                throw new Error("lỗi lấy dữ liệu thông báo");
+            }
+            const notificationdata = await response.json();
+            return notificationdata;
 
-    }catch(error){
-        console.error(" lỗi khi fetch dữ liệu thông báo : ",error);
-        return null;
+        }catch(error){
+            console.error(" lỗi khi fetch dữ liệu thông báo : ",error);
+            return null;
+        }
     }
-}
 export const addnotification = async(notification: notification): Promise< notification > =>{
     const response = await fetch(API_URL,{
         method: "POST",
