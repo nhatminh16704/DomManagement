@@ -53,7 +53,7 @@ export const getnotificationtype = async(type:string): Promise<notification[]> =
             return null;
         }
     }
-export const addnotification = async(notification: notification): Promise< notification > =>{
+export const addnotification = async(notification: Omit<notification, "id">): Promise< notification > =>{
     const response = await fetch(API_URL,{
         method: "POST",
         headers: { "Content-Type": "application/json" },
