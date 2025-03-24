@@ -4,6 +4,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { useRouter } from "next/navigation";
+import { jwtDecode } from "jwt-decode";
 
 import { Button } from "@/components/ui/button";
 import {
@@ -38,34 +39,77 @@ export default function LoginForm() {
     },
   });
 
+  // async function onSubmit(values: z.infer<typeof formSchema>) {
+  //   const { account, password } = values;
+  //   const apiUrl = `http://localhost:3001/accounts?username=${account}&password=${password}`;
+  
+  //   try {
+  //     const response = await fetch(apiUrl);
+  //     const data = await response.json();
+  
+  //     if (data.length === 0) {
+  //       setError("Sai tài khoản hoặc mật khẩu!");
+  //       return;
+  //     }
+  
+  //     const user = data[0];
+  
+  //     // Lưu thông tin đăng nhập vào localStorage
+  //     localStorage.setItem("user", JSON.stringify(user));
+  
+  //     // Chuyển hướng tùy theo vai trò
+  //     if (user.role === "admin") {
+  //       router.push("/");
+  //     } else {
+  //       router.push("/");
+  //     }
+  //   } catch (err) {
+  //     setError(`Lỗi kết nối đến server! ${err}`);
+  //   }
+  // }
   async function onSubmit(values: z.infer<typeof formSchema>) {
+    setError(""); // Reset lỗi trước khi gửi request
+    console.log("Giá trị nhập:", values);
     const { account, password } = values;
-    const apiUrl = `http://localhost:3001/accounts?username=${account}&password=${password}`;
+    const apiUrl = "http://localhost:8081/auth/login";
   
     try {
-      const response = await fetch(apiUrl);
-      const data = await response.json();
-  
-      if (data.length === 0) {
+      const response = await fetch(apiUrl, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          username: account,
+          password: password
+        }),
+      });
+      if (!response.ok) {
         setError("Sai tài khoản hoặc mật khẩu!");
         return;
-      }
-  
-      const user = data[0];
-  
-      // Lưu thông tin đăng nhập vào localStorage
-      localStorage.setItem("user", JSON.stringify(user));
-  
-      // Chuyển hướng tùy theo vai trò
-      if (user.role === "admin") {
-        router.push("/");
-      } else {
-        router.push("/");
-      }
-    } catch (err) {
-      setError(`Lỗi kết nối đến server! ${err}`);
+    }
+
+    const token = await response.text(); // API chỉ trả về chuỗi token
+    console.log("Token nhận được:", token);
+
+    // Giải mã JWT để lấy thông tin user
+    const decodedToken: any = jwtDecode(token);
+    console.log("Thông tin từ token:", decodedToken);
+
+    localStorage.setItem("token", token);
+    localStorage.setItem("user", JSON.stringify(decodedToken));
+
+    if (decodedToken.role === "ADMIN") {
+        router.push("/admin"); // Điều hướng trang admin
+    } else {
+        router.push("/dashboard"); // Điều hướng trang user
+    }
+    } catch (err: any) {
+      console.error("Lỗi kết nối:", err);
+      setError(`Lỗi kết nối đến server! ${err.message}`);
     }
   }
+  
   
 
   return (

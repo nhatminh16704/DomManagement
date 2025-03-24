@@ -37,7 +37,8 @@ export default function AnnouncementsDetail() {
         ? new Date(notifications.created_date).toLocaleDateString("vi-VN")
         : "Không có ngày"}
         </p>
-        <p><strong>Người viết: </strong>{notifications?.account_id}</p>
+        <p><strong>Người viết: </strong>{notifications?.createdBy}</p>
+          
       <Button className="mt-4 bg-blue-500" onClick={() => router.back()}>
         Quay lại
       </Button>

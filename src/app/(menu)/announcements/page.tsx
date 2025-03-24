@@ -4,18 +4,18 @@ import React from 'react'
   import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Select from "react-select";
-import { getnotification, getnotificationtype, notification } from '@/services/notificationService';
+import { getnotification, getnotificationtype, gettype, notification } from '@/services/notificationService';
+import { date } from 'zod';
 
 export default function Announcements() {
   const router=useRouter();
   const [notifications, setnotification] = useState<notification[]>([]);
-  const typeNotification: string[] = ["Thông báo 1", "Thông báo 2", "Thông báo 3"];
+  const [typeNotification, setTypeNotification] = useState<string[]>([]); 
   const [selected, setSelected] = useState<String>("");
   const [selectKey, setSelectKey] = useState(0); 
 
   useEffect(() => {
     getnotification().then((data) => {
-      // Chuyển đổi created_date thành Date
       const formattedData = data.map((item) => ({
         ...item,
         created_date: new Date(item.created_date),
@@ -25,15 +25,25 @@ export default function Announcements() {
       console.error("Lỗi khi lấy danh sách thông báo:", err);
     });
   }, []);
+  useEffect(()=>{
+    gettype()
+      .then((data) => {
+        setTypeNotification(data);
+      })
+      .catch((err) => {
+        console.error("Lỗi khi lấy danh sách loại thông báo:", err);
+      });
+  }, []);
+  
 
   const navigateToDetailPage = (notificationId: number) => {
     const url=`/announcements/${notificationId}`;
     router.push(url);
   };
 
+
+
   const navigateToAddPage = () => {
-    // const url=`/addanouncement/`;
-    // router.push(url);
     router.push("/addannouncement");
   };
 
