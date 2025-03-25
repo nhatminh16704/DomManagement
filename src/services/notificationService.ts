@@ -1,10 +1,11 @@
+import { notificationDTO } from "@/app/(menu)/announcements/[id]/page";
 import { error } from "console";
 import { number } from "zod";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/notifications";
 export type notification = {
     id: number;
-    account_id: number;
+    createdBy: number;
     title: string;
     content: string;
     created_date: Date;
@@ -79,14 +80,11 @@ export const gettype= async(): Promise<string[]> =>{
     }
 }
 
-
-export const getnotificationId = async(id: number): Promise<notification | null> =>{
+export const getnotificationId = async(id: number): Promise<notificationDTO | null> =>{
         try{
-            
             if (!token) {
                 throw new Error("Không tìm thấy token!");
-            }
-    
+            }  
             const response = await fetch(`${API_URL}/${id}`, {
                 method: "GET",
                 headers: {
@@ -99,20 +97,27 @@ export const getnotificationId = async(id: number): Promise<notification | null>
             }
             const notificationdata = await response.json();
             return notificationdata;
-
         }catch(error){
             console.error(" lỗi khi fetch dữ liệu thông báo : ",error);
             return null;
         }
     }
-export const addnotification = async(notification: Omit<notification, "id">): Promise< notification > =>{
+
+export const addnotification = async(notification: Omit<notification, "id" | "created_date">): Promise< String > =>{
+    if (!token) {
+        console.error("Không có token, cần đăng nhập!");
+        throw new Error("Người dùng chưa đăng nhập.");
+    }
     const response = await fetch(API_URL+ "/create",{
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: { 
+            "Authorization": `Bearer ${token}`,
+            "Content-Type": "application/json" 
+        },
         body: JSON.stringify(notification),
     })
     if (!response.ok) {
         throw new Error("Lỗi khi thêm thông báo ");
     }
-    return response.json();
+    return response.text();
 }

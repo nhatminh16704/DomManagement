@@ -3,14 +3,18 @@ import { addnotification, gettype, notification } from "@/services/notificationS
 import { useRouter } from "next/navigation";
 import React, { useState, useEffect } from "react";
 import Select from "react-select";
+import authService  from "@/services/authService";
 
 export default function AddAnnouncementPage() {
   const router = useRouter();
   const [typeNotification, setTypeNotification] = useState<string[]>([]);
   
-  const user = typeof window !== "undefined" ? localStorage.getItem("user") : null;
-  const userData = user ? JSON.parse(user) : null;
-  const userId = userData?.id;
+  const userId = authService.getUserId();
+  if (userId !== null) {
+    console.log("User ID:", userId);
+  } else {
+    console.log("User chưa đăng nhập.");
+  }
 
   useEffect(() => {
     gettype()
@@ -21,7 +25,7 @@ export default function AddAnnouncementPage() {
   const [formData, setFormData] = useState({
     title: "",
     content: "",
-    type: "", // Lưu loại thông báo đã chọn
+    type: "", 
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -35,17 +39,16 @@ export default function AddAnnouncementPage() {
       alert("Bạn chưa đăng nhập!");
       return;
     }
+    const newNotification: Omit<notification, "id" | "created_date"> = {
+      title: formData.title,
+      content: formData.content,
+      type: formData.type,
+      createdBy: userId,
+    };
     try {
-      const newNotification: Omit<notification, "id" | "created_date"> = {
-        title: formData.title,
-        content: formData.content,
-        type: formData.type,
-        createdBy: Number(userId),
-         
-      };
       await addnotification(newNotification);
       alert("Thông báo đã được tạo!");
-      router.push("/announcements");
+      //router.push("/announcements");
     } catch (e) {
       console.error("Lỗi:", e);
       alert("Gửi thông báo thất bại!");

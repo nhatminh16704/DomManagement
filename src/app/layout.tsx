@@ -5,23 +5,21 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Menu from "@/components/Menu";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
-import { isAuthenticated } from "@/services/auth";
+import { useEffect} from "react";
+import authService  from "@/services/authService";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [user, setUser] = useState(null);
   const isLoginPage = pathname === "/login";
 
   useEffect(() => {
-    const authUser = isAuthenticated();
+    const authUser = authService.isAuthenticated();
     if (!authUser && !isLoginPage) {
       router.push("/login"); // Nếu chưa login và không ở trang login, redirect về login
-    } else {
-      setUser(authUser);
     }
   }, [isLoginPage, pathname, router]);
 
@@ -33,8 +31,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     );
   }
 
-  if (!user) {
-    return null; // Tránh render trong lúc check login
+  if (!authService.isAuthenticated() && !isLoginPage) {
+    return null; // Tránh render khi chưa xác thực
   }
 
   return (
