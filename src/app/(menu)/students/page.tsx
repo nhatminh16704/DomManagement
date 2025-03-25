@@ -24,6 +24,7 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { getStudents, deleteStudent, Student } from "@/services/studentService";
+import { Eye, Trash2, PenSquare } from "lucide-react"; // Added PenSquare icon for edit
 
 export default function Students() {
   const router = useRouter();
@@ -61,6 +62,11 @@ export default function Students() {
   const navigateToDetailPage = (studentId: number) => {
     const studentDetailUrl = `/students/${studentId}`;
     router.push(studentDetailUrl);
+  };
+
+  const navigateToEditPage = (studentId: number) => {
+    const studentEditUrl = `/students/edit/${studentId}`;
+    router.push(studentEditUrl);
   };
 
   const filteredStudents = students.filter((student) => {
@@ -146,20 +152,32 @@ export default function Students() {
               <TableCell>{student.phoneNumber}</TableCell>
               <TableCell>{student.hometown}</TableCell>
               <TableCell>
-                <Button
-                  size="sm"
-                  className="mr-2 bg-blue-500"
+                <div className="flex gap-3">
+                    <Button
+                    size="icon"
+                    className="h-10 w-10 bg-lightsuccess text-success hover:bg-success hover:text-white transition-colors"
+                    onClick={() => navigateToEditPage(student.id)}
+                    title="Chỉnh sửa"
+                    >
+                    <PenSquare className="h-6 w-6" />
+                    </Button>
+                  <Button
+                  size="icon"
+                  className="h-10 w-10 bg-lightinfo text-info hover:bg-info hover:text-white transition-colors"
                   onClick={() => navigateToDetailPage(student.id)}
-                >
-                  Xem
-                </Button>
-                <Button
-                  size="sm"
-                  className="bg-red-500"
+                  title="Xem chi tiết"
+                  >
+                  <Eye className="h-6 w-6" />
+                  </Button>
+                  <Button
+                  size="icon"
+                  className="h-10 w-10 bg-lighterror text-error hover:bg-error hover:text-white transition-colors"
                   onClick={() => handleDelete(student.id)}
-                >
-                  Xóa
-                </Button>
+                  title="Xóa sinh viên"
+                  >
+                  <Trash2 className="h-6 w-6" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}

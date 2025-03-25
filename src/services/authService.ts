@@ -84,6 +84,12 @@ class AuthService {
     return payload?.role || null;
   }
 
+  // Lấy id người dùng từ token
+  getUserId(): number | null {
+    const payload = this.getPayload();
+    return payload?.id || null;
+  }
+
   // Kiểm tra token có hết hạn không
   isTokenExpired(token?: string): boolean {
     const payload = this.getPayload(token);

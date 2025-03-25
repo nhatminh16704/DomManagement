@@ -1,9 +1,9 @@
   "use client";
 
-  import Header from "../components/Header";
+  import Header from "../components/layouts/Header";
   import { Inter } from "next/font/google";
   import "./globals.css";
-  import Menu from "@/components/Menu";
+  import Menu from "@/components/layouts/Menu";
   import { usePathname, useRouter } from "next/navigation";
   import { useEffect} from "react";
   import authService from "@/services/authService";
@@ -14,15 +14,16 @@
     const pathname = usePathname();
     const router = useRouter();
     const isLoginPage = pathname === "/login";
+    const isNotFoundPage = pathname === "/not-found";
 
     useEffect(() => {
       const authUser = authService.isAuthenticated();
-      if (!authUser && !isLoginPage) {
+      if (!authUser && !isLoginPage && !isNotFoundPage) {
         router.push("/login"); // Nếu chưa login và không ở trang login, redirect về login
       }
-    }, [isLoginPage, pathname, router]);
+    }, [isLoginPage, isNotFoundPage, pathname, router]);
 
-    if (isLoginPage) {
+    if (isLoginPage || isNotFoundPage) {
       return (
         <html lang="en">
           <body className={inter.className}>{children}</body>
@@ -35,12 +36,12 @@
     }
 
     return (
-      <html lang="en">
-        <body className={inter.className}>
+      <html lang="en" className="h-full">
+        <body className={`${inter.className} flex flex-col h-full`}>
           <Header />
-          <div className="flex">
+          <div className="flex flex-1 h-[calc(100vh-64px)]"> {/* Adjust 64px to match your header height */}
             <Menu />
-            <main className="flex-1 p-10 pl-20">{children}</main>
+            <main className="overflow-auto flex-1 p-10 pl-20">{children}</main>
           </div>
         </body>
       </html>
