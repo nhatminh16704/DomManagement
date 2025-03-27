@@ -1,8 +1,7 @@
 export type Student = {
   id: number;
   studentCode: string;
-  firstName: string;
-  lastName: string;
+  fullName: string;
   birthday: string;
   gender: string;
   className: string;
@@ -48,53 +47,72 @@ export async function getStudentById(studentCode: number): Promise<Student> {
   }
 }
 
-// Thêm sinh viên mới
-export async function addStudent(student: Student): Promise<Student> {
+export async function createStudent(student: Omit<Student, 'id'>): Promise<string> {
   try {
-    const response = await fetch(API_URL, {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(student),
+    const token = localStorage.getItem('token');
+    const response = await fetch(API_URL + "/create", {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(student)
     });
+
     if (!response.ok) {
-      throw new Error("Lỗi khi thêm sinh viên");
+      const errorMessage = await response.text();
+      throw new Error(errorMessage);
     }
-    return await response.json();
+
+    return await response.text();
   } catch (error) {
-    console.error("Error adding student:", error);
-    throw error;
+    throw new Error(error instanceof Error ? error.message : String(error));
   }
 }
 
-// Cập nhật sinh viên
-export async function updateStudent(student: Student): Promise<Student> {
+
+export async function updateStudent(id: number, student: Student): Promise<string> {
   try {
-    const response = await fetch(`${API_URL}/${student.studentCode}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(student),
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/update/${id}`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`
+      },
+      body: JSON.stringify(student)
     });
+
     if (!response.ok) {
-      throw new Error("Lỗi khi cập nhật sinh viên");
+      const errorMessage = await response.text();
+      throw new Error(errorMessage);
     }
-    return await response.json();
+
+    return await response.text();
   } catch (error) {
-    console.error("Error updating student:", error);
-    throw error;
+    throw new Error(error instanceof Error ? error.message : String(error));
   }
 }
 
-// Xóa sinh viên
-export async function deleteStudent(studentCode: number): Promise<void> {
+export async function deleteStudent(id: number): Promise<string> {
   try {
-    const response = await fetch(`${API_URL}/${studentCode}`, {
-      method: "DELETE",
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/delete/${id}`, {
+      method: 'DELETE',
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
+
     if (!response.ok) {
-      throw new Error("Lỗi khi xóa sinh viên");
+      const errorMessage = await response.text();
+      throw new Error(errorMessage);
     }
+
+    return await response.text();
   } catch (error) {
-    console.error("Error deleting student:", error);
-    throw error;
+    throw new Error(error instanceof Error ? error.message : String(error));
   }
 }
+
+

@@ -59,7 +59,8 @@ export default {
 		lighterror: '#fa896b20',
 		lightinfo: '#ebf3fe',
 		darkinfo: '#223662',
-		lightwarning: '#ffae1f20'
+		lightwarning: '#ffae1f20',
+		colorprimary: '#5d87ff'
 	},
 		borderRadius: {
 			lg: 'var(--radius)',
