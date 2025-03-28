@@ -51,7 +51,7 @@ export default function RootLayout({
           <Menu />
           <main className="overflow-auto flex-1 p-10 pl-20">{children}</main>
         </div>
-        <ToastContainer position="top-right" autoClose={3000} />
+        <ToastContainer position="bottom-right" autoClose={3000} />
       </body>
     </html>
   );
