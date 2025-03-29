@@ -48,7 +48,7 @@ export default function AddAnnouncementPage() {
     try {
       await addnotification(newNotification);
       alert("Thông báo đã được tạo!");
-      //router.push("/announcements");
+      router.push("/announcements");
     } catch (e) {
       console.error("Lỗi:", e);
       alert("Gửi thông báo thất bại!");
