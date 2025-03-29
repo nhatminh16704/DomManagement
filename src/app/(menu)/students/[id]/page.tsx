@@ -1,49 +1,140 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter, useParams } from "next/navigation";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Badge } from "@/components/ui/badge";
+import { Calendar, Mail, MapPin, Phone, User } from "lucide-react"; // Biểu tượng từ lucide-react
+import { useParams } from "next/navigation";
 import { getStudentById, Student } from "@/services/studentService";
-import { Button } from "@/components/ui/button";
+import { useEffect, useState } from "react";
+import RentalInfo from "@/components/student/RentalInfo";
 
-export default function StudentDetail() {
-  const router = useRouter();
-  const params = useParams(); //Dùng useParams để lấy params
-  const [student, setStudent] = useState<Student | null>(null);
-  const [loading, setLoading] = useState(true);
 
+
+
+export default function ProfilePage() {
+  
+  const { id } = useParams();
+  const [student, setStudent] = useState<Student | undefined>();
+
+  
   useEffect(() => {
-    if (!params.id) return;
-
-    getStudentById(Number(params.id))
-      .then((data) => {
-        setStudent(data);
-        setLoading(false);
-      })
-      .catch(() => {
-        setLoading(false);
-      });
-  }, [params.id]);
-
-  if (loading) {
-    return <p>Đang tải dữ liệu...</p>;
-  }
+    const fetchStudentData = async () => {
+      try {
+        const studentId = Number(id);
+        if (!isNaN(studentId)) {
+          const studentData = await getStudentById(studentId);
+          setStudent(studentData);
+        }
+      } catch (error) {
+        console.error("Error fetching student data:", error);
+      }
+    };
+    
+    fetchStudentData();
+  }, [id]);
+  
 
   return (
-    <div className="p-6">
-      <h1 className="text-2xl font-bold mb-4">Thông tin sinh viên</h1>
-      <div className="border p-4 rounded-lg shadow-md bg-white">
-        <p><strong>Mã sinh viên:</strong> {student?.studentId}</p>
-        <p><strong>Họ và Tên:</strong> {student?.firstName} {student?.lastName}</p>
-        <p><strong>Ngày sinh:</strong> {student?.birthday}</p>
-        <p><strong>Giới tính:</strong> {student?.gender}</p>
-        <p><strong>Lớp:</strong> {student?.className}</p>
-        <p><strong>Số điện thoại:</strong> {student?.phoneNumber}</p>
-        <p><strong>Email:</strong> {student?.email}</p>
-        <p><strong>Quê quán:</strong> {student?.hometown}</p>
-      </div>
-      <Button className="mt-4 bg-blue-500" onClick={() => router.back()}>
-        Quay lại
-      </Button>
+    <div className="bg-gray-100 p-4 flex flex-col items-center">
+      <Card className="w-full max-w-7xl shadow-lg rounded-lg overflow-hidden mb-6">
+        {/* Header với ảnh đại diện và tên */}
+        <div className="relative bg-gradient-to-r from-blue-500 to-indigo-600 h-40">
+          <div className="absolute -bottom-16 left-8">
+            <Avatar className="h-32 w-32 border-4 border-white shadow-md">
+              <AvatarImage
+                src="https://via.placeholder.com/150"
+                alt="Profile"
+              />
+              <AvatarFallback>{student?.fullName.charAt(0) || ''}</AvatarFallback>
+            </Avatar>
+          </div>
+        </div>
+
+        {/* Nội dung chính */}
+        <CardHeader className="pt-20 pb-4">
+          <div className="flex justify-between items-start">
+            <div>
+              <CardTitle className="text-3xl font-bold text-gray-800">
+                {student?.fullName || ''}
+              </CardTitle>
+              <p className="text-sm text-gray-500">
+                Mã SV: {student?.studentCode || ''}
+              </p>
+            </div>
+            <Badge
+              variant="outline"
+              className="bg-green-500 text-white text-base px-4 py-1 font-semibold"
+            >
+              Active
+            </Badge>
+          </div>
+        </CardHeader>
+
+        <CardContent className="space-y-6">
+          {/* Thông tin cá nhân */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {/* Ngày sinh */}
+            <div className="flex items-center space-x-3">
+              <Calendar className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="text-sm font-medium text-gray-700">Ngày sinh</p>
+                <p className="text-gray-600">{student?.birthday || ''}</p>
+              </div>
+            </div>
+
+            {/* Lớp */}
+            <div className="flex items-center space-x-3">
+              <User className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="text-sm font-medium text-gray-700">Lớp</p>
+                <p className="text-gray-600">{student?.className || ''}</p>
+              </div>
+            </div>
+
+            {/* Số điện thoại */}
+            <div className="flex items-center space-x-3">
+              <Phone className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="text-sm font-medium text-gray-700">
+                  Số điện thoại
+                </p>
+                <p className="text-gray-600">{student?.phoneNumber || ''}</p>
+              </div>
+            </div>
+
+            {/* Email */}
+            <div className="flex items-center space-x-3">
+              <Mail className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="text-sm font-medium text-gray-700">Email</p>
+                <p className="text-gray-600">{student?.email || ''}</p>
+              </div>
+            </div>
+
+            {/* Quê quán */}
+            <div className="flex items-center space-x-3">
+              <MapPin className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="text-sm font-medium text-gray-700">Quê quán</p>
+                <p className="text-gray-600">{student?.hometown || ''}</p>
+              </div>
+            </div>
+
+            {/* Account ID */}
+            <div className="flex items-center space-x-3">
+              <User className="h-5 w-5 text-gray-500" />
+              <div>
+                <p className="text-sm font-medium text-gray-700">Gender</p>
+                <p className="text-gray-600">{student?.gender || ''}</p>
+              </div>
+            </div>
+          </div>
+        </CardContent>
+      </Card>
+      
+      <RentalInfo studentId={student?.id} />
+      
     </div>
   );
 }

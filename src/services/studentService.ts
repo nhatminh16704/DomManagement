@@ -33,12 +33,17 @@ export async function getStudents(): Promise<Student[]> {
   }
 }
 
-// Lấy sinh viên theo mã
 export async function getStudentById(studentCode: number): Promise<Student> {
   try {
-    const response = await fetch(`${API_URL}/${studentCode}`);
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/${studentCode}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
     if (!response.ok) {
-      throw new Error("Không tìm thấy sinh viên");
+      const errorMessage = await response.text();
+      throw new Error(errorMessage);
     }
     return await response.json();
   } catch (error) {
