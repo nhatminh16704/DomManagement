@@ -1,4 +1,5 @@
 import type { Config } from "tailwindcss";
+import tailwindcssAnimate from "tailwindcss-animate";
 
 export default {
     darkMode: ["class"],
@@ -43,20 +44,30 @@ export default {
   			border: 'hsl(var(--border))',
   			input: 'hsl(var(--input))',
   			ring: 'hsl(var(--ring))',
-  			chart: {
-  				'1': 'hsl(var(--chart-1))',
-  				'2': 'hsl(var(--chart-2))',
-  				'3': 'hsl(var(--chart-3))',
-  				'4': 'hsl(var(--chart-4))',
-  				'5': 'hsl(var(--chart-5))'
-  			}
-  		},
-  		borderRadius: {
-  			lg: 'var(--radius)',
-  			md: 'calc(var(--radius) - 2px)',
-  			sm: 'calc(var(--radius) - 4px)'
-  		}
-  	}
+		chart: {
+			'1': 'hsl(var(--chart-1))',
+			'2': 'hsl(var(--chart-2))',
+			'3': 'hsl(var(--chart-3))',
+			'4': 'hsl(var(--chart-4))',
+			'5': 'hsl(var(--chart-5))'
+		},
+		info: '#539bff',
+		success: '#13deb9',
+		warning: '#ffae1f',
+		error: '#fa896b',
+		lightsuccess: '#13deb920',
+		lighterror: '#fa896b20',
+		lightinfo: '#ebf3fe',
+		darkinfo: '#223662',
+		lightwarning: '#ffae1f20',
+		colorprimary: '#5d87ff'
+	},
+		borderRadius: {
+			lg: 'var(--radius)',
+			md: 'calc(var(--radius) - 2px)',
+			sm: 'calc(var(--radius) - 4px)'
+		}
+	}
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [tailwindcssAnimate],
 } satisfies Config;

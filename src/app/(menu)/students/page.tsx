@@ -20,62 +20,44 @@ import {
   PaginationNext,
   PaginationPrevious,
 } from "@/components/ui/pagination";
-
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { getStudents, deleteStudent, Student } from "@/services/studentService";
+import { Eye, Trash2, PenSquare } from "lucide-react";
+import AddStudentModal from "@/components/student/AddStudentModal";
+import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
+import { toast } from "react-toastify";
 
 export default function Students() {
   const router = useRouter();
   const [students, setStudents] = useState<Student[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
-  const [currentPage, setCurrentPage] = useState(1); // State cho trang hiện tại
-  const studentsPerPage = 8; // Số sinh viên mỗi trang
+  const [currentPage, setCurrentPage] = useState(1);
+  const studentsPerPage = 8;
+  const [isOpen, setIsOpen] = useState(false);
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
 
   // Fetch danh sách sinh viên
   useEffect(() => {
     getStudents()
-      .then((data) => {
-        setStudents(data);
-      })
-      .catch((err) => {
-        console.error("Lỗi khi lấy danh sách sinh viên:", err);
-      });
+      .then((data) => setStudents(data))
+      .catch((err) => console.error("Lỗi khi lấy danh sách sinh viên:", err));
   }, []);
 
-  const handleDelete = async (studentId: number) => {
-    const isConfirmed = confirm("Bạn có chắc chắn muốn xóa sinh viên này?");
-    if (isConfirmed) {
-      try {
-        await deleteStudent(studentId);
-        const updatedStudents = students.filter(
-          (student) => student.id !== studentId
-        );
-        setStudents(updatedStudents);
-      } catch (error) {
-        console.error("Lỗi khi xóa sinh viên:", error);
-      }
-    }
-  };
-
   const navigateToDetailPage = (studentId: number) => {
-    const studentDetailUrl = `/students/${studentId}`;
-    router.push(studentDetailUrl);
+    router.push(`/students/${studentId}`);
   };
 
   const filteredStudents = students.filter((student) => {
-    const fullName = `${student.firstName} ${student.lastName}`;
-    const normalizedFullName = fullName.toLowerCase();
-    const normalizedStudentId = student.studentId.toLowerCase();
+    const fullName = student.fullName.toLowerCase();
+    const normalizedStudentId = student.studentCode.toLowerCase();
     const normalizedSearchTerm = searchTerm.toLowerCase();
-    
     return (
-      normalizedFullName.includes(normalizedSearchTerm) ||
+      fullName.includes(normalizedSearchTerm) ||
       normalizedStudentId.includes(normalizedSearchTerm)
     );
   });
 
-  // Tính toán phân trang
   const indexOfLastStudent = currentPage * studentsPerPage;
   const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
   const currentStudents = filteredStudents.slice(
@@ -84,22 +66,57 @@ export default function Students() {
   );
   const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
 
-  // Tạo mảng số trang
-  const pageNumbers = Array.from({ length: Math.min(totalPages, 3) }, (_, i) =>
-    currentPage > 2 && totalPages > 3 ? currentPage - 1 + i : i + 1
-  );
+  useEffect(() => setCurrentPage(1), [searchTerm]);
 
-  // Reset về trang 1 khi searchTerm thay đổi
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [searchTerm]);
-
-  // Hàm chuyển trang
   const nextPage = () => {
     if (currentPage < totalPages) setCurrentPage(currentPage + 1);
   };
   const prevPage = () => {
     if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
+
+  const pageNumbers = Array.from({ length: Math.min(totalPages, 3) }, (_, i) =>
+    currentPage > 2 && totalPages > 3 ? currentPage - 1 + i : i + 1
+  );
+
+  const refreshStudents = () => {
+    getStudents()
+      .then((data) => setStudents(data))
+      .catch((err) => console.error("Lỗi khi lấy danh sách sinh viên:", err));
+  };
+
+  const [selectedStudent, setSelectedStudent] = useState<Student | undefined>();
+
+  const handleAddStudent = () => {
+    setIsOpen(true);
+    setSelectedStudent(undefined);
+  };
+
+  const handleEditStudent = (student: Student) => {
+    setIsOpen(true);
+    setSelectedStudent(student);
+  };
+
+  const handleDelete = async () => {
+    if (!selectedStudentId) return;
+
+    try {
+      await deleteStudent(selectedStudentId);
+      toast.success("Deleted successfully!");
+      refreshStudents();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : String(error));
+    }
+    setIsConfirmOpen(false);
+  };
+
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(
+    null
+  );
+  const openConfirmModal = (studentId: number) => {
+    setSelectedStudentId(studentId);
+    setIsConfirmOpen(true);
+
   };
 
   return (
@@ -108,15 +125,42 @@ export default function Students() {
         <h1 className="text-2xl font-semibold text-gray-800 mb-5">
           Danh sách sinh viên
         </h1>
-        <div className="hidden md:flex items-center gap-2 text-sm rounded-full ring-[1.5px] ring-gray-300 px-2">
-          <Image src="/search.png" alt="Search" width={16} height={16} />
-          <input
-            type="text"
-            placeholder="Tìm kiếm sinh viên..."
-            value={searchTerm}
-            onChange={(e) => setSearchTerm(e.target.value)}
-            className="w-[250px] p-2 bg-transparent outline-none"
+
+        <div className="flex items-center gap-4">
+          <Button
+            className="bg-colorprimary hover:bg-colorprimary/90 text-white"
+            onClick={handleAddStudent}
+          >
+            Thêm sinh viên
+          </Button>
+          <AddStudentModal
+            isOpen={isOpen}
+            onClose={() => setIsOpen(false)}
+            onStudentAdded={refreshStudents}
+            student={selectedStudent}
           />
+          <ConfirmDialog
+            isOpen={isConfirmOpen}
+            onClose={() => setIsConfirmOpen(false)}
+            message="Are you sure you want to delete this student?"
+            onConfirm={handleDelete}
+          />
+          <div className="hidden md:flex items-center gap-2 text-sm rounded-full ring-[1.5px] ring-gray-300 px-3 py-1 transition-all hover:ring-gray-400 hover:ring-2 focus-within:ring-colorprimary focus-within:ring-2 group">
+            <Image
+              src="/search.png"
+              alt="Search"
+              width={16}
+              height={16}
+              className="opacity-70 group-hover:opacity-80"
+            />
+            <input
+              type="text"
+              placeholder="Tìm kiếm sinh viên..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-[250px] p-2 bg-transparent outline-none text-gray-700 placeholder:text-gray-400"
+            />
+          </div>
         </div>
       </div>
       <Table>
@@ -135,48 +179,57 @@ export default function Students() {
         </TableHeader>
         <TableBody>
           {currentStudents.map((student) => (
-            <TableRow key={student.studentId}>
-              <TableCell>{student.studentId}</TableCell>
-              <TableCell>
-                {student.firstName} {student.lastName}
-              </TableCell>
+            <TableRow key={student.id}>
+              <TableCell>{student.studentCode}</TableCell>
+              <TableCell>{student.fullName}</TableCell>
               <TableCell>{student.birthday}</TableCell>
               <TableCell>{student.gender}</TableCell>
               <TableCell>{student.className}</TableCell>
               <TableCell>{student.phoneNumber}</TableCell>
               <TableCell>{student.hometown}</TableCell>
               <TableCell>
-                <Button
-                  size="sm"
-                  className="mr-2 bg-blue-500"
-                  onClick={() => navigateToDetailPage(student.id)}
-                >
-                  Xem
-                </Button>
-                <Button
-                  size="sm"
-                  className="bg-red-500"
-                  onClick={() => handleDelete(student.id)}
-                >
-                  Xóa
-                </Button>
+                <div className="flex gap-3">
+                  <Button
+                    size="icon"
+                    className="h-10 w-10 bg-lightsuccess text-success hover:bg-success hover:text-white transition-colors"
+                    onClick={() => handleEditStudent(student)}
+                    title="Chỉnh sửa"
+                  >
+                    <PenSquare className="h-6 w-6" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    className="h-10 w-10 bg-lightinfo text-info hover:bg-info hover:text-white transition-colors"
+                    onClick={() => navigateToDetailPage(student.id)}
+                    title="Xem chi tiết"
+                  >
+                    <Eye className="h-6 w-6" />
+                  </Button>
+                  <Button
+                    size="icon"
+                    className="h-10 w-10 bg-lighterror text-error hover:bg-error hover:text-white transition-colors"
+                    onClick={() => openConfirmModal(student.id)}
+                    title="Xóa sinh viên"
+                  >
+                    <Trash2 className="h-6 w-6" />
+                  </Button>
+                </div>
               </TableCell>
             </TableRow>
           ))}
         </TableBody>
       </Table>
-
-      {/* Nút phân trang với Pagination */}
       <div className="flex justify-between items-center mt-4">
         <Pagination>
           <PaginationContent>
             <PaginationItem>
               <PaginationPrevious
-              onClick={prevPage}
-              className={`
-              hover:bg-blue-500 hover:text-white transition-colors 
-              ${currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"}
-              `}
+                onClick={prevPage}
+                className={`hover:bg-blue-500 hover:text-white transition-colors ${
+                  currentPage === 1
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }`}
               />
             </PaginationItem>
             {pageNumbers.map((number) => (
@@ -190,7 +243,6 @@ export default function Students() {
                 </PaginationLink>
               </PaginationItem>
             ))}
-            {/*Hiển thị dấu ... nếu totalPages > 3 và currentPage < totalPages - 1 */}
             {totalPages > 3 && currentPage < totalPages - 1 && (
               <PaginationItem>
                 <PaginationEllipsis />
@@ -199,10 +251,11 @@ export default function Students() {
             <PaginationItem>
               <PaginationNext
                 onClick={nextPage}
-                className={`
-                  hover:bg-blue-500 hover:text-white transition-colors 
-                  ${currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"}
-                  `}
+                className={`hover:bg-blue-500 hover:text-white transition-colors ${
+                  currentPage === totalPages
+                    ? "pointer-events-none opacity-50"
+                    : "cursor-pointer"
+                }`}
               />
             </PaginationItem>
           </PaginationContent>

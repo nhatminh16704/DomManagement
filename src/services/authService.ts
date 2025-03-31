@@ -84,12 +84,14 @@ class AuthService {
     return payload?.role || null;
   }
 
+
   // Kiểm tra token có hết hạn không
   isTokenExpired(token?: string): boolean {
     const payload = this.getPayload(token);
     if (!payload || !payload.exp) return true;
     return payload.exp * 1000 < Date.now(); // Chuyển từ giây sang mili giây
   }
+
 
   //lấy ID từ
   getUserId(): number | null {
@@ -107,5 +109,4 @@ class AuthService {
     }
   }
 }
-
 export default new AuthService(); // Export instance singleton

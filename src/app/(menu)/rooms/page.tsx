@@ -33,7 +33,7 @@ export default function Rooms() {
 
   const filteredRooms = rooms.filter((room) => {
     // Kiểm tra xem room_id có chứa từ khóa tìm kiếm không
-    const normalizedRoomId = room.roomId.toLowerCase();
+    const normalizedRoomId = room.roomName.toLowerCase();
     const normalizedSearchTerm = searchTerm.toLowerCase();
 
     // Kiểm tra xem room_id có chứa từ khóa tìm kiếm không
@@ -74,7 +74,7 @@ export default function Rooms() {
       });
   }, []);
 
-  const navigateToDetailPage = (roomId: string) => {
+  const navigateToDetailPage = (roomId: number) => {
     const roomDetailUrl = `/rooms/${roomId}`;
     router.push(roomDetailUrl);
   };
@@ -103,24 +103,24 @@ export default function Rooms() {
             <TableHead>ID Phòng</TableHead>
             <TableHead>Loại phòng</TableHead>
             <TableHead>Giá phòng</TableHead>
-            <TableHead>Tổng số giường</TableHead>
-            <TableHead>Giường còn trống</TableHead>
+            <TableHead>Số người tối đa</TableHead>
+            <TableHead>Còn trống</TableHead>
             <TableHead>Hành động</TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {currentRooms.map((room) => (
-            <TableRow key={room.roomId}>
-              <TableCell>{room.roomId}</TableCell>
+            <TableRow key={room.id}>
+              <TableCell>{room.roomName}</TableCell>
               <TableCell>{room.typeRoom}</TableCell>
               <TableCell>{room.price}</TableCell>
-              <TableCell>{room.totalBeds}</TableCell>
-              <TableCell>{room.availableBeds}</TableCell>
+              <TableCell>{room.maxStudents}</TableCell>
+              <TableCell>{room.available}</TableCell>
               <TableCell>
                 <Button
                   size="sm"
                   className="mr-2 bg-blue-500"
-                  onClick={() => navigateToDetailPage(room.roomId)}
+                  onClick={() => navigateToDetailPage(room.id)}
                 >
                   Xem
                 </Button>
