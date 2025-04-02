@@ -17,11 +17,6 @@ export default function Announcements() {
   const [selected, setSelected] = useState<String>("");
   const [selectKey, setSelectKey] = useState(0);
   const userId = authService.getUserId();
-    if (userId !== null) {
-      console.log("User ID:", userId);
-    } else {
-      console.log("User chưa đăng nhập.");
-    } 
   const [formData, setFormData] = useState({
       title: "",
       content: "",
@@ -52,14 +47,11 @@ export default function Announcements() {
         alert("Gửi thông báo thất bại!");
       }
     };
+
   useEffect(() => {
     getnotification().then((data) => {
-      const formattedData = data.map((item) => ({
-        ...item,
-        created_date: new Date(item.created_date),
-      }));
-      setAllNotifications(formattedData);
-      setnotification(formattedData);
+      setAllNotifications(data);
+      setnotification(data);
     }).catch((err) => {
       console.error("Lỗi khi lấy danh sách thông báo:", err);
     });
@@ -89,7 +81,7 @@ export default function Announcements() {
   
 
   return (
-    <div className="flex flex-col h-full bg-[#F7F8FA]">
+    <div className="flex flex-col h-full bg-[#F7F8FA] p-4">
       <div className="flex justify-between items-center mb-5">
         <h1 className="text-2xl font-semibold text-gray-800 mb-6">Notification</h1>
         <div className="hidden md:flex items-center gap-2 text-sm rounded-full ring-gray-300 px-2">
@@ -125,53 +117,57 @@ export default function Announcements() {
 
         </div>
       </div>
-      <div className="flex-grow max-h-[500px] overflow-y-auto border border-gray-600 rounded-md p-2">
+      <div className="flex-grow max-h-[500px] overflow-y-auto border border-gray-300 rounded-md p-2 bg-white">
         <ul className="space-y-2">
           {notifications.map((item) => (
             <li
               key={item.id}
-              className="flex justify-between items-center border-b border-gray-600 pb-2 cursor-pointer"
+              className="flex justify-between items-center p-3 border-b border-gray-300 cursor-pointer hover:bg-gray-200 rounded-md transition"
               onClick={() => navigateToDetailPage(item.id)}
             >
-              <span className="text-blue-400">▶ {item.title}</span>
-              <span className="text-sm text-gray-400">{item.created_date.toLocaleDateString()}</span>
+              <div>
+                <p className="font-semibold text-gray-900">{item.title}</p>
+              </div>
+              <span className="text-sm text-gray-400">{item?.created_date
+                      ? new Date(item.created_date).toLocaleDateString("vi-VN")
+                      : "Không có ngày"}</span>
             </li>
           ))}
         </ul>
       </div>
 
       {showForm && (
-      <div className="fixed inset-0 flex justify-center items-center bg-black bg-opacity-50">
-        <div className="bg-gray-800 p-6 rounded-lg shadow-md w-4/5 max-w-lg">
-          <h2 className="text-2xl font-semibold text-center text-white mb-4">Tạo Thông Báo Mới</h2>
+      <div className="fixed inset-0 flex justify-center items-center bg-white bg-opacity-50">
+        <div className="bg-white p-6 rounded-lg shadow-md w-4/5 max-w-lg">
+          <h2 className="text-2xl font-semibold text-center text-black mb-4">Tạo Thông Báo Mới</h2>
           <form className="flex flex-col gap-4" onSubmit={addNotification}>
             <div>
-              <label htmlFor="title" className="block text-white mb-1">Tiêu đề</label>
+              <label htmlFor="title" className="block text-black mb-1">Tiêu đề</label>
               <input
                 type="text"
                 id="title"
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full px-3 py-2 rounded-md bg-black text-white border border-gray-600"
+                className="w-full px-3 py-2 rounded-md bg-white text-white border border-gray-600"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="content" className="block text-white mb-1">Nội dung</label>
+              <label htmlFor="content" className="block text-black mb-1">Nội dung</label>
               <textarea
                 id="content"
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
-                className="w-full h-[200px] px-3 py-2 rounded-md bg-black text-white border border-gray-600"
+                className="w-full h-[200px] px-3 py-2 rounded-md bg-white text-white border border-gray-600"
                 required
               />
             </div>
 
             <div>
-              <label htmlFor="type" className="block text-white mb-1">Loại thông báo</label>
+              <label htmlFor="type" className="block text-black mb-1">Loại thông báo</label>
               <Select
                 id="type"
                 className="w-full"
@@ -198,7 +194,7 @@ export default function Announcements() {
           </form>
         </div>
       </div>
-    )}
+      )}
 
 
     </div>
