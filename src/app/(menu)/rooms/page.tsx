@@ -11,6 +11,7 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
+import { Badge } from "@/components/ui/badge";
 import {
   Pagination,
   PaginationContent,
@@ -104,7 +105,7 @@ export default function Rooms() {
             <TableHead>Loại phòng</TableHead>
             <TableHead>Giá phòng</TableHead>
             <TableHead>Số người tối đa</TableHead>
-            <TableHead>Còn trống</TableHead>
+            <TableHead>Trạng thái</TableHead>
             <TableHead>Hành động</TableHead>
           </TableRow>
         </TableHeader>
@@ -115,7 +116,17 @@ export default function Rooms() {
               <TableCell>{room.typeRoom}</TableCell>
               <TableCell>{room.price}</TableCell>
               <TableCell>{room.maxStudents}</TableCell>
-              <TableCell>{room.available}</TableCell>
+                <TableCell>
+                {room.available === 0 ? (
+                  <Badge variant="destructive">
+                  Đã đầy
+                  </Badge>
+                ) : (
+                  <Badge variant="outline" className="bg-green-500 text-white">
+                  Còn trống: {room.available}
+                  </Badge>
+                )}
+                </TableCell>
               <TableCell>
                 <Button
                   size="sm"

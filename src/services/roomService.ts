@@ -1,6 +1,6 @@
 // services/roomService.ts
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/rooms";
-
+import { Student } from "@/services/studentService";
 export interface Room {
   id: number;
   roomName: string;        
@@ -12,11 +12,20 @@ export interface Room {
   // Add your new fields here
 }
 
+export interface Device {
+  deviceName: string;
+  quantity: number;
+}
+export interface RoomDetail extends Room {
+  students: Student[];
+  devices: Device[];
+}
+
+
 // Hàm lấy dữ liệu phòng từ API
 export const getRooms = async (): Promise<Room[]> => {
   try {
-    // Fix for Next.js SSR - check if window exists before accessing localStorage
-    const token = typeof window !== 'undefined' ? localStorage.getItem('token') : null;
+    const token = localStorage.getItem('token');
 
     const headers: HeadersInit = {
       'Content-Type': 'application/json'
@@ -42,4 +51,31 @@ export const getRooms = async (): Promise<Room[]> => {
   }
 };
 
-// getRoomById function already has the fix for localStorage in SSR
+
+export const getRoomDetail = async (roomId: number): Promise<RoomDetail | null> => {
+  try {
+    const token = localStorage.getItem('token');
+
+    const headers: HeadersInit = {
+      'Content-Type': 'application/json'
+    };
+    
+    if (token) {
+      headers['Authorization'] = `Bearer ${token}`;
+    }
+
+    const response = await fetch(`${API_URL}/${roomId}`, {
+      headers
+    });
+
+    if (!response.ok) {
+      throw new Error("Lỗi khi lấy chi tiết phòng");
+    }
+    
+    const data = await response.json();
+    return data;
+  } catch (error) {
+    console.error("Lỗi khi fetch chi tiết phòng:", error);
+    return null;
+  }
+};

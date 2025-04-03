@@ -62,12 +62,6 @@ export default function ProfilePage() {
                 Mã SV: {student?.studentCode || ''}
               </p>
             </div>
-            <Badge
-              variant="outline"
-              className="bg-green-500 text-white text-base px-4 py-1 font-semibold"
-            >
-              Active
-            </Badge>
           </div>
         </CardHeader>
 
@@ -125,7 +119,7 @@ export default function ProfilePage() {
             <div className="flex items-center space-x-3">
               <User className="h-5 w-5 text-gray-500" />
               <div>
-                <p className="text-sm font-medium text-gray-700">Gender</p>
+                <p className="text-sm font-medium text-gray-700">Giới tính</p>
                 <p className="text-gray-600">{student?.gender || ''}</p>
               </div>
             </div>
