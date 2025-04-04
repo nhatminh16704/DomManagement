@@ -101,14 +101,14 @@ const menuItems = [
 ];
 
 
-const Menu = ({ numberMessage }: { numberMessage: number }) => {
+const Menu = () => {
   const pathname = usePathname();
-
+  const [numberMessage,setnumberMessage] = useState(1);
+  const updateNumberMessage = (newMessageCount: number) => {
+    setnumberMessage(newMessageCount);
+  };
   return (
-
     <div className="p-5 relative">
-
-
     {menuItems.map((i) => (
       <div className="flex flex-col gap-2" key={i.title}>
         <span className="hidden lg:block text-gray-400 font-light my-4">
