@@ -110,3 +110,23 @@ export const searchUser = async(key: String): Promise<UseSearchDTO[]> =>{
     }  
 }
 
+export const findMessageByIdForAdmin = async(id: number): Promise<message|null> =>{
+    try{
+        if(!token){
+            throw new Error("Không tìm thấy token!");
+        }
+        const response = await fetch(`${API_URL}/findId/${id}`,{
+            method: "GET",
+            headers: {
+                "Authorization": `Bearer ${token}`, 
+                "Content-Type": "application/json"
+            }
+        });
+        const messagesdto = await  response.json();
+        return messagesdto;
+    }catch(e){
+        console.error("lỗi khi lấy tin nhắn của 1 người: ",e);
+        return null
+    }  
+}
+

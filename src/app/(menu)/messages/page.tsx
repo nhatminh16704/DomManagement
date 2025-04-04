@@ -22,12 +22,11 @@ export type MessageRequest  ={
 
 export default function Messages() {
   const router = useRouter();
-  const [message, setmessages] = useState<message[]>([]);
-  const [messagebysender,setmessagesbysender] = useState<message[]>([]);
   const [showmessage, setshowmessage] = useState<message[]>([]);
   const [userSearch, setUserSearch] = useState<UseSearchDTO[]>([]);
   const [showForm, setShowForm] = useState(false);
   const userId = authService.getUserId();
+  const role = authService.getRole();
   const [formData, setFormData] = useState({
     title: "",
     content: "",
@@ -38,48 +37,29 @@ export default function Messages() {
   
   useEffect(()=>{
     if(userId!=null){
-      getmessages(userId).then((data) => {
-        setmessages(data);
-        setshowmessage(data);
-        const unreadMessages = data.filter((message) => !message.read).length;
-        localStorage.setItem("numberMessage", unreadMessages.toString());
-      }).catch((e) =>{
-        console.error("lỗi khi lấy danh sách message: ", e);
-      });
-
-      getmessagesBySender(userId).then((data) => {
-        setmessagesbysender(data);
-      }).catch((e) =>{
-        console.error("lỗi khi lấy danh sách messagebysender: ", e);
-      });
-  }else{
-    console.error("lỗi khi lấy useId bằng null")
-  };  
+      if(role =="ADMIN"){
+        getmessagesBySender(userId).then((data) => {
+          setshowmessage(data);
+        }).catch((e) =>{
+          console.error("lỗi khi lấy danh sách messagebysender: ", e);
+        });
+      }else{
+          getmessages(userId).then((data) => {
+          setshowmessage(data);
+          const unreadMessages = data.filter((message) => !message.read).length;
+          localStorage.setItem("numberMessage", unreadMessages.toString());
+          window.dispatchEvent(new Event("numberMessageUpdated"));
+        }).catch((e) =>{
+          console.error("lỗi khi lấy danh sách message: ", e);
+        });
+      };
+    }else{
+        console.error("lỗi khi lấy useId bằng null")
+    };  
+    
   },[]);
 
-  const changemessagesbysender=()=>{
-    setshowmessage(messagebysender);
-  }
-  const changemessages=()=>{
-    setshowmessage(message);
-  }
   const viewMessageDetails = (messageId: number) => {
-    if(userId!=null){getmessages(userId).then((data) => {
-      setmessages(data);
-      setshowmessage(data);
-    }).catch((e) =>{
-      console.error("lỗi khi lấy danh sách message: ", e);
-    });}
-    if(userId!=null){
-      getmessages(userId).then((data) => {
-        setmessages(data);
-        setshowmessage(data);
-        const unreadMessages = data.filter((message) => !message.read).length;
-        localStorage.setItem("numberMessage", unreadMessages.toString());
-      }).catch((e) =>{
-        console.error("lỗi khi lấy danh sách message: ", e);
-      });
-    }
     router.push(`/messages/${messageId}`);
   };
 
@@ -130,9 +110,9 @@ export default function Messages() {
 
   return (
     <div className="h-full overflow-y-auto bg-gray-100 p-4 ">
-      <div className="flex justify-between items-center mb-4">
-        <div className="flex space-x-2">
-          <button className="p-2 hover:bg-gray-200 rounded-full" 
+      <div className={`flex justify-between items-center mb-4 ${ role === 'ADMIN' ? '' : 'hidden'}`}>        
+        <div className={"flex space-x-2"}>
+          {/* <button className="p-2 hover:bg-gray-200 rounded-full hidden" 
           title="Hộp thư đến"
           onClick={changemessages}
           >
@@ -169,7 +149,7 @@ export default function Messages() {
                 d="M22 2L11 13M22 2L15 22l-4-9-9-4z"
               ></path>
             </svg>
-          </button>
+          </button> */}
           <button className="p-2 hover:bg-gray-200 rounded-full" title="Soạn thư" onClick={()=>setShowForm(true)}>
             <svg
               className="w-5 h-5"

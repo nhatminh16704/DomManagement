@@ -17,6 +17,7 @@ export default function Announcements() {
   const [selected, setSelected] = useState<String>("");
   const [selectKey, setSelectKey] = useState(0);
   const userId = authService.getUserId();
+  const role = authService.getRole();
   const [formData, setFormData] = useState({
       title: "",
       content: "",
@@ -87,7 +88,7 @@ export default function Announcements() {
         <div className="hidden md:flex items-center gap-2 text-sm rounded-full ring-gray-300 px-2">
           <Button 
             size="lg" 
-            className="bg-blue-500"
+            className={`bg-blue-500 ${role === 'ADMIN' ? '' : 'hidden'}`}
             onClick={navigateToAddPage}
             >
             Add Notification

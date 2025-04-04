@@ -101,11 +101,11 @@ const menuItems = [
 ];
 
 
-const Menu = () => {
+const Menu = ({ numberMessage }: { numberMessage: number }) => {
   const pathname = usePathname();
-  const [numberMessage,setnumberMessage] = useState(1)
+
   return (
-    
+
     <div className="p-5 relative">
 
 

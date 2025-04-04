@@ -1,7 +1,7 @@
 "use client"
 
 import authService from "@/services/authService";
-import { getmessagesbyId, message } from "@/services/messageService";
+import { findMessageByIdForAdmin, getmessagesbyId, message } from "@/services/messageService";
 import { useParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -11,12 +11,20 @@ export default function MessageDetail(){
     const {id} = useParams();
     const [message , setmessage] = useState<message|null>();
     const userId = Number(authService.getUserId());
+    const role = authService.getRole();
     useEffect(()=>{
         const messageID= Number(id);
         if(isNaN(messageID)||isNaN(userId)) return;
-        getmessagesbyId(messageID,userId).then((data)=>{
-            setmessage(data);
-        })
+        if(role==="ADMIN"){
+            findMessageByIdForAdmin(messageID).then((data)=>{
+                setmessage(data)
+            })
+        }else{
+            getmessagesbyId(messageID,userId).then((data)=>{
+                setmessage(data);
+            })
+        }
+        
     })
 
     return(

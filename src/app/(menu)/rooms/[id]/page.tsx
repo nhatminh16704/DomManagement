@@ -12,10 +12,31 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { RoomDetail, getRoomDetail } from "@/services/roomService";
+import authService from "@/services/authService";
+import { payment, registrationRoom } from "@/services/roomrentalService";
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+
+export type roomRentalRequest ={
+  roomId: number;
+  price: number;
+  accountId: number;
+}
+export type PaymentRequest ={
+  amount: number;
+  bankCode: String;
+  idRef: number;
+}
 
 export default function RoomDetailPage() {
   const { id } = useParams();
   const [roomDetail, setRoomDetail] = useState<RoomDetail | null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<boolean | null>(null);
+  const role = authService.getRole();
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const userId = authService.getUserId();
+
+  const params = new URLSearchParams(location.search);
+  const status = params.get("status");
 
   useEffect(() => {
     const fetchRoomDetail = async () => {
@@ -30,20 +51,69 @@ export default function RoomDetailPage() {
     if (id) {
       fetchRoomDetail();
     }
-  }, [id]);
+    if (status != null) {
+      const newStatus = status === "success" ? true : false;
+      setPaymentStatus(newStatus);
+      console.log(paymentStatus)
+    }
+  }, [id, status]);
+  useEffect(() => {
+      setIsVisible(true);
+      setTimeout(() => {
+        setIsVisible(false);
+      }, 2000);
+  },[paymentStatus]);
 
   if (!roomDetail) {
     return <div className="p-8">Không tìm thấy phòng</div>;
   }
 
   const { students, devices, room } = roomDetail;
+ 
+  const handleregistrationRoom= async ()=>{
+    if (userId !== null) {
+      const request: roomRentalRequest = {
+        roomId: room.id,
+        price: room.price,
+        accountId: userId
+      };
+      console.log(request);
   
+      try {
+        const registId = await registrationRoom(request);
+        if(registId!=null){
+          const paymentRequest: PaymentRequest={
+            amount: room.price*6,
+            bankCode: "NCB",
+            idRef: Number(registId),
+          }
+          const path = await payment(paymentRequest);
+          if (path) {
+            window.location.href = path;
+          }
+        }
+        console.log("Đăng ký thành công, ID:", registId);
+      } catch (error) {
+        console.error("Lỗi khi đăng ký phòng:", error);
+      }
+    }
+
+  }
   
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Chi tiết phòng {room.roomName}</h1>
-
+        <div className="flex justify-between items-center p-4 border-b">
+          <div className="text-xl font-bold">Chi tiết phòng {room.roomName}</div>
+          
+          <div>
+            <button className={room.available>0 && role === "STUDENT"?"px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600":"px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hidden" } 
+           onClick={handleregistrationRoom}
+           >
+              Đăng ký
+            </button>
+          </div>
+        </div>
       {/* Room Information Card */}
       <Card className="mb-8">
         <CardHeader>
@@ -206,6 +276,25 @@ export default function RoomDetailPage() {
           </Tabs>
         </CardContent>
       </Card>
+
+      {isVisible && paymentStatus != null && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-700 bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+            {paymentStatus == true ? (
+              <div className="flex justify-center items-center text-green-500">
+                <CheckCircleIcon className="h-8 w-8 mr-2" />
+                Thanh toán thành công
+              </div>
+            ) : (
+              <div className="flex justify-center items-center text-red-500">
+                <XCircleIcon className="h-8 w-8 mr-2" />
+                Thanh toán thất bại
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }
