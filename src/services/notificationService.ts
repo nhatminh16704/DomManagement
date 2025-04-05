@@ -6,7 +6,7 @@ export type notification = {
     createdBy: number;
     title: string;
     content: string;
-    created_date: Date;
+    createdDate: Date;
     type: string;
 }
 const token = localStorage.getItem("token");
@@ -101,7 +101,7 @@ export const getnotificationId = async(id: number): Promise<notificationDTO | nu
         }
     }
 
-export const addnotification = async(notification: Omit<notification, "id" | "created_date">): Promise< String > =>{
+export const addnotification = async(notification: Omit<notification, "id" | "createdDate">): Promise< String > =>{
     if (!token) {
         console.error("Không có token, cần đăng nhập!");
         throw new Error("Người dùng chưa đăng nhập.");

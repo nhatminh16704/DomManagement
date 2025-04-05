@@ -33,7 +33,7 @@ export default function Announcements() {
         alert("Bạn chưa đăng nhập!");
         return;
       }
-      const newNotification: Omit<notification, "id" | "created_date"> = {
+      const newNotification: Omit<notification, "id" | "createdDate"> = {
         title: formData.title,
         content: formData.content,
         type: formData.type,
@@ -129,8 +129,8 @@ export default function Announcements() {
               <div>
                 <p className="font-semibold text-gray-900">{item.title}</p>
               </div>
-              <span className="text-sm text-gray-400">{item?.created_date
-                      ? new Date(item.created_date).toLocaleDateString("vi-VN")
+              <span className="text-sm text-gray-400">{item?.createdDate
+                      ? new Date(item.createdDate).toLocaleDateString("vi-VN")
                       : "Không có ngày"}</span>
             </li>
           ))}
@@ -150,7 +150,7 @@ export default function Announcements() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full px-3 py-2 rounded-md bg-white text-white border border-gray-600"
+                className="w-full px-3 py-2 rounded-md bg-white text-black border border-gray-600"
                 required
               />
             </div>
@@ -162,7 +162,7 @@ export default function Announcements() {
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
-                className="w-full h-[200px] px-3 py-2 rounded-md bg-white text-white border border-gray-600"
+                className="w-full h-[200px] px-3 py-2 rounded-md bg-white text-black border border-gray-600"
                 required
               />
             </div>

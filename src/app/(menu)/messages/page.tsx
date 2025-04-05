@@ -112,44 +112,6 @@ export default function Messages() {
     <div className="h-full overflow-y-auto bg-gray-100 p-4 ">
       <div className={`flex justify-between items-center mb-4 ${ role === 'ADMIN' ? '' : 'hidden'}`}>        
         <div className={"flex space-x-2"}>
-          {/* <button className="p-2 hover:bg-gray-200 rounded-full hidden" 
-          title="Hộp thư đến"
-          onClick={changemessages}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                d="M3 8l9 6 9-6M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"
-              ></path>
-            </svg>
-          </button>
-          <button className="p-2 hover:bg-gray-200 rounded-full" 
-          title="Thư đã gửi"
-          onClick={changemessagesbysender}
-          >
-            <svg
-              className="w-5 h-5"
-              fill="none"
-              stroke="currentColor"
-              viewBox="0 0 24 24"
-              xmlns="http://www.w3.org/2000/svg"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth="2"
-                d="M22 2L11 13M22 2L15 22l-4-9-9-4z"
-              ></path>
-            </svg>
-          </button> */}
           <button className="p-2 hover:bg-gray-200 rounded-full" title="Soạn thư" onClick={()=>setShowForm(true)}>
             <svg
               className="w-5 h-5"
@@ -177,7 +139,7 @@ export default function Messages() {
             onClick={()=> viewMessageDetails(email.id)}
           >
             {/* Placeholder for avatar */}
-            <div className={email.read? " font-medium flex-1" :"font-bold flex-1"}>
+            <div className={(email.read === undefined || email.read === false) ? "font-bold flex-1" : "font-medium flex-1"}>
               <div className=" flex justify-between ">
                 <span className="text-gray-900">
                   {email.sentBy}
@@ -207,7 +169,7 @@ export default function Messages() {
                 name="title"
                 value={formData.title}
                 onChange={handleChange}
-                className="w-full px-3 py-2 rounded-md bg-white text-white border border-gray-600"
+                className="w-full px-3 py-2 rounded-md bg-white text-black border border-gray-600"
                 required
               />
             </div>
@@ -219,7 +181,7 @@ export default function Messages() {
                 name="content"
                 value={formData.content}
                 onChange={handleChange}
-                className="w-full h-[200px] px-3 py-2 rounded-md bg-white text-white border border-gray-600"
+                className="w-full h-[200px] px-3 py-2 rounded-md bg-white text-black border border-gray-600"
                 required
               />
             </div>
