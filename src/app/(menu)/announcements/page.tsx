@@ -4,15 +4,23 @@ import React from 'react'
   import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Select from "react-select";
-import { addnotification, getnotification, getnotificationtype, gettype, notification } from '@/services/notificationService';
-import { date } from 'zod';
+import { addnotification, createNotification, getnotification, notification } from '@/services/notificationService';
 import authService from '@/services/authService';
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
 
 export default function Announcements() {
   const router=useRouter();
   const [showForm, setShowForm] = useState(false);
   const [allNotifications, setAllNotifications] = useState<notification[]>([]);
   const [notifications, setnotification] = useState<notification[]>([]);
+  const [selectedNotification, setSelectedNotification] = useState<notification | null>(null);
   const typeNotification= ['GENERAL','BILLING','MAINTENANCE','SECURITY','EVENT','RULES','URGENT']; 
   const [selected, setSelected] = useState<String>("");
   const [selectKey, setSelectKey] = useState(0);
@@ -33,7 +41,7 @@ export default function Announcements() {
         alert("Bạn chưa đăng nhập!");
         return;
       }
-      const newNotification: Omit<notification, "id" | "createdDate"> = {
+      const newNotification: createNotification = {
         title: formData.title,
         content: formData.content,
         type: formData.type,
@@ -59,9 +67,11 @@ export default function Announcements() {
   }, []);
   
 
-  const navigateToDetailPage = (notificationId: number) => {
-    const url=`/announcements/${notificationId}`;
-    router.push(url);
+  const openNotificationDetail = (notificationId: number) => {
+    const item = notifications.find((n) => n.id === notificationId);
+    if (item) {
+      setSelectedNotification(item);
+    }
   };
 
   const navigateToAddPage = () => {
@@ -124,13 +134,13 @@ export default function Announcements() {
             <li
               key={item.id}
               className="flex justify-between items-center p-3 border-b border-gray-300 cursor-pointer hover:bg-gray-200 rounded-md transition"
-              onClick={() => navigateToDetailPage(item.id)}
+              onClick={() => openNotificationDetail(item.id)}
             >
               <div>
                 <p className="font-semibold text-gray-900">{item.title}</p>
               </div>
-              <span className="text-sm text-gray-400">{item?.createdDate
-                      ? new Date(item.createdDate).toLocaleDateString("vi-VN")
+              <span className="text-sm text-gray-400">{item?.create_date
+                      ? new Date(item.create_date).toLocaleDateString("vi-VN")
                       : "Không có ngày"}</span>
             </li>
           ))}
@@ -138,63 +148,96 @@ export default function Announcements() {
       </div>
 
       {showForm && (
-      <div className="fixed inset-0 flex justify-center items-center bg-white bg-opacity-50">
-        <div className="bg-white p-6 rounded-lg shadow-md w-4/5 max-w-lg">
-          <h2 className="text-2xl font-semibold text-center text-black mb-4">Tạo Thông Báo Mới</h2>
-          <form className="flex flex-col gap-4" onSubmit={addNotification}>
-            <div>
-              <label htmlFor="title" className="block text-black mb-1">Tiêu đề</label>
-              <input
-                type="text"
-                id="title"
-                name="title"
-                value={formData.title}
-                onChange={handleChange}
-                className="w-full px-3 py-2 rounded-md bg-white text-black border border-gray-600"
-                required
-              />
-            </div>
+      <Dialog open={showForm} onOpenChange={setShowForm}>
+      <DialogContent className="max-w-lg w-full">
+        <DialogHeader>
+          <DialogTitle className="text-2xl font-semibold text-center text-black">
+            Tạo Thông Báo Mới
+          </DialogTitle>
+        </DialogHeader>
+    
+        <form className="flex flex-col gap-4 mt-2" onSubmit={addNotification}>
+          <div>
+            <label htmlFor="title" className="block text-black mb-1">Tiêu đề</label>
+            <input
+              type="text"
+              id="title"
+              name="title"
+              value={formData.title}
+              onChange={handleChange}
+              className="w-full px-3 py-2 rounded-md bg-white text-black border border-gray-600"
+              required
+            />
+          </div>
+    
+          <div>
+            <label htmlFor="content" className="block text-black mb-1">Nội dung</label>
+            <textarea
+              id="content"
+              name="content"
+              value={formData.content}
+              onChange={handleChange}
+              className="w-full h-[200px] px-3 py-2 rounded-md bg-white text-black border border-gray-600"
+              required
+            />
+          </div>
+    
+          <div>
+            <label htmlFor="type" className="block text-black mb-1">Loại thông báo</label>
+            <Select
+              id="type"
+              className="w-full"
+              options={typeNotification.map((item) => ({ value: item, label: item }))}
+              placeholder="Chọn loại thông báo"
+              isClearable
+              value={formData.type ? { value: formData.type, label: formData.type } : null}
+              onChange={(selectedOption) =>
+                setFormData({ ...formData, type: selectedOption ? selectedOption.value : "" })
+              }
+            />
+          </div>
+    
+          <DialogFooter className="mt-4 flex justify-end gap-2">
+            <button
+              type="button"
+              onClick={() => setShowForm(false)}
+              className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md transition"
+            >
+              Hủy
+            </button>
+            <button
+              type="submit"
+              className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition"
+            >
+              Gửi Thông Báo
+            </button>
+          </DialogFooter>
+        </form>
+      </DialogContent>
+    </Dialog>
+      )}
 
-            <div>
-              <label htmlFor="content" className="block text-black mb-1">Nội dung</label>
-              <textarea
-                id="content"
-                name="content"
-                value={formData.content}
-                onChange={handleChange}
-                className="w-full h-[200px] px-3 py-2 rounded-md bg-white text-black border border-gray-600"
-                required
-              />
-            </div>
 
-            <div>
-              <label htmlFor="type" className="block text-black mb-1">Loại thông báo</label>
-              <Select
-                id="type"
-                className="w-full"
-                options={typeNotification.map((item) => ({ value: item, label: item }))}
-                placeholder="Chọn loại thông báo"
-                isClearable
-                value={formData.type ? { value: formData.type, label: formData.type } : null}
-                onChange={(selectedOption) =>
-                  setFormData({ ...formData, type: selectedOption ? selectedOption.value : "" })
-                }
-              />
-            </div>
-
-            <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setShowForm(false)}
-                className="bg-gray-500 hover:bg-gray-600 text-white py-2 px-4 rounded-md transition">
-                Hủy
-              </button>
-              <button type="submit"
-                className="bg-blue-600 hover:bg-blue-700 text-white py-2 px-4 rounded-md transition">
-                Gửi Thông Báo
-              </button>
-            </div>
-          </form>
-        </div>
-      </div>
+      {selectedNotification && (
+        <Dialog open={!!selectedNotification} onOpenChange={() => setSelectedNotification(null)}>
+          <DialogContent className="max-w-xl">
+            <DialogHeader>
+              <DialogTitle className="text-xl text-blue-600">Chi tiết thông báo</DialogTitle>
+              <DialogDescription className="text-gray-700 space-y-2">
+                <p><strong>Tiêu đề:</strong> {selectedNotification.title}</p>
+                <p><strong>Loại:</strong> {selectedNotification.type}</p>
+                <p><strong>Ngày tạo:</strong> {selectedNotification?.create_date
+                  ? new Date(selectedNotification.create_date).toLocaleString("vi-VN")
+                  : "Không có ngày"}
+                </p>
+                <p className="whitespace-pre-line mt-1"><strong>Nội dung:</strong>{selectedNotification.content}</p>
+              </DialogDescription>
+            </DialogHeader>
+            <DialogFooter>
+              <Button variant="destructive" onClick={() => setSelectedNotification(null)}>Đóng</Button>
+            </DialogFooter>
+          </DialogContent>
+        </Dialog>
       )}
 
 
