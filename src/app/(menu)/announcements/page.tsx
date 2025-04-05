@@ -223,11 +223,11 @@ export default function Announcements() {
           <DialogContent className="max-w-xl">
             <DialogHeader>
               <DialogTitle className="text-xl text-blue-600">Chi tiết thông báo</DialogTitle>
-              <DialogDescription className="text-gray-700 space-y-2">
+              <DialogDescription className="border rounded-md p-4 bg-gray-50 space-y-3 mt-2 text-gray-700">
                 <p><strong>Tiêu đề:</strong> {selectedNotification.title}</p>
                 <p><strong>Loại:</strong> {selectedNotification.type}</p>
                 <p><strong>Ngày tạo:</strong> {selectedNotification?.create_date
-                  ? new Date(selectedNotification.create_date).toLocaleString("vi-VN")
+                  ? new Date(selectedNotification.create_date).toLocaleDateString("vi-VN")
                   : "Không có ngày"}
                 </p>
                 <p className="whitespace-pre-line mt-1"><strong>Nội dung:</strong>{selectedNotification.content}</p>
