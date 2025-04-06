@@ -1,4 +1,4 @@
-import { notificationDTO } from "@/app/(menu)/announcements/[id]/page";
+
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/notifications";
 export type notification = {

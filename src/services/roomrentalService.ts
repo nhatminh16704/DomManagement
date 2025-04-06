@@ -44,7 +44,11 @@ export const registrationRoom = async(roomRental: roomRentalRequest): Promise<st
     });
     if (!response.ok) {
       console.log("Response status:", response.status);
-      throw new Error(`Lỗi fetch đăng ký phòng`);
+      if (response.status === 400) {
+        const errorMessage = await response.text(); 
+        return errorMessage;
+      }
+      throw new Error(`Lỗi fetch đăng ký phòng: ${response.statusText}`);
       
     }
     return await response.json();

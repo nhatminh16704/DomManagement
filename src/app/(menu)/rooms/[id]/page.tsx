@@ -34,6 +34,7 @@ export default function RoomDetailPage() {
   const role = authService.getRole();
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const userId = authService.getUserId();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const params = new URLSearchParams(location.search);
   const status = params.get("status");
@@ -54,13 +55,14 @@ export default function RoomDetailPage() {
     if (status != null) {
       const newStatus = status === "success" ? true : false;
       setPaymentStatus(newStatus);
-      console.log(paymentStatus)
+      setErrorMessage(newStatus? "Thanh toán thành công":"Thanh toán thất bại");
     }
   }, [id, status]);
   useEffect(() => {
       setIsVisible(true);
       setTimeout(() => {
         setIsVisible(false);
+        setPaymentStatus(null);
       }, 2000);
   },[paymentStatus]);
 
@@ -69,6 +71,8 @@ export default function RoomDetailPage() {
   }
 
   const { students, devices, room } = roomDetail;
+
+  
  
   const handleregistrationRoom= async ()=>{
     if (userId !== null) {
@@ -82,17 +86,26 @@ export default function RoomDetailPage() {
       try {
         const registId = await registrationRoom(request);
         if(registId!=null){
-          const paymentRequest: PaymentRequest={
+          if(!isNaN(Number(registId))){
+            const paymentRequest: PaymentRequest={
             amount: room.price*6,
             bankCode: "NCB",
             idRef: Number(registId),
-          }
-          const path = await payment(paymentRequest);
-          if (path) {
-            window.location.href = path;
-          }
+            }
+            const path = await payment(paymentRequest);
+            if (path) {
+              window.location.href = path;
+            }
+            console.log("Đăng ký thành công, ID:", registId);
+            setErrorMessage(null);
+          }else{
+            if(registId==="Ngoài thời gian đăng ký" || registId=== "You can't rent more rooms"){
+              setIsVisible(true);
+              setPaymentStatus(false);
+              setErrorMessage(registId);
+            }
+          } 
         }
-        console.log("Đăng ký thành công, ID:", registId);
       } catch (error) {
         console.error("Lỗi khi đăng ký phòng:", error);
       }
@@ -283,12 +296,12 @@ export default function RoomDetailPage() {
             {paymentStatus == true ? (
               <div className="flex justify-center items-center text-green-500">
                 <CheckCircleIcon className="h-8 w-8 mr-2" />
-                Thanh toán thành công
+                <span>{errorMessage}</span>
               </div>
             ) : (
               <div className="flex justify-center items-center text-red-500">
                 <XCircleIcon className="h-8 w-8 mr-2" />
-                Thanh toán thất bại
+                <span>{errorMessage}</span>
               </div>
             )}
           </div>
