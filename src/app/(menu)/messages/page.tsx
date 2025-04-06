@@ -1,53 +1,41 @@
-// pages/inbox.js
+"use client";
+import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import {
-  ChevronLeftIcon,
-  ChevronRightIcon,
-} from "@heroicons/react/24/outline";
-
-const emails = [
-  {
-    sender: "Neil Sims",
-    title: "Project Update",
-    content:
-      "Am no an listening depending up believing. Enough around remove to barton agreed regret in or it. Advantage mr estimable be commanded pro...",
-    time: "17 April at 09:28 PM",
-  },
-  {
-    sender: "Bonnie Green",
-    title: "Meeting Schedule",
-    content:
-      "For norland produce age wishing. To figure on it spring season up. Her provision acuteness had excellent two why intention. As called mr nee...",
-    time: "16 April at 10:28 PM",
-  },
-  {
-    sender: "Roberta Casas",
-    title: "Design Approval",
-    content:
-      "Silent sir say desire fat him letter. Whatever settling goodness too and honoured she building answered her. Strongly thoughts remember mr to...",
-    time: "16 April at 02:28 PM",
-  },
-  {
-    sender: "Michael Gough",
-    title: "Feedback Request",
-    content:
-      "Smallest directly families surprise honoured am an. Speaking replying mistress him numerous she returned feelings may day. Evening way luckily s...",
-    time: "15 April at 10:28 PM",
-  },
-  {
-    sender: "Jese Leos",
-    title: "Weekly Report",
-    content:
-      "Sing long her way size. Waited end mutual missed myself the little sister one. So in pointed or chicken cheered neither spirits invited. Marianne an...",
-    time: "14 April at 07:28 PM",
-  },
-];
-
-
+  markMessageAsRead,
+  getMessages,
+  Message,
+} from "@/services/messageService";
+import { useEffect, useState } from "react";
+import { toast } from "react-toastify";
+import { useRouter } from "next/navigation";
+import { useContext } from "react";
+import { UnreadMessagesContext } from "@/contexts/UnreadMessagesContext";
 
 export default function Messages() {
+  const context = useContext(UnreadMessagesContext);
+  const [messages, setMessages] = useState<Message[]>([]);
+  const router = useRouter();
+
+  useEffect(() => {
+    const fetchMessages = async () => {
+      try {
+        const fetchedMessages = await getMessages();
+        // Sort messages by date (newest first)
+        fetchedMessages.sort(
+          (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+        );
+        setMessages(fetchedMessages);
+      } catch (error) {
+        toast.error("Failed to load messages");
+        console.error("Error fetching messages:", error);
+      }
+    };
+
+    fetchMessages();
+  }, []);
+
   return (
     <div className="h-full overflow-y-auto bg-gray-100 p-4 ">
-      
       {/* Header with Compose Button */}
       <div className="flex justify-between items-center mb-4">
         <div className="flex space-x-2">
@@ -112,25 +100,61 @@ export default function Messages() {
 
       {/* Email List */}
       <div className="bg-white rounded-lg shadow-md">
-        {emails.map((email, index) => (
-          <div
-            key={index}
-            className="flex items-center p-4 border-b last:border-b-0 hover:bg-gray-50"
-          >
-            <div className="flex-1">
-              <div className="flex justify-between items-center mb-1">
-                <span className="font-medium text-gray-900">
-                  {email.sender}
-                </span>
-                <span className="text-gray-500 text-sm">{email.time}</span>
+        {messages.map((email, index) => {
+          const goToMessageDetail = () => {
+            router.push(`/messages/${email.id}`);
+            // Mark message as read if it's currently unread
+            if (!email.read) {
+              try {
+                markMessageAsRead(email.id);
+                context?.setUnreadCount((prev) => prev - 1);
+              } catch (error) {
+                console.error("Error marking message as read:", error);
+                toast.error("Failed to mark message as read");
+              }
+            }
+          };
+
+          return (
+            <div
+              key={index}
+              className="flex items-center p-4 border-b last:border-b-0 hover:bg-gray-50 cursor-pointer transition-colors duration-200"
+              onClick={goToMessageDetail}
+            >
+              <div className="h-10 w-10 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center font-medium mr-4">
+                {email.sentBy.charAt(0)}
               </div>
-              <div className="flex items-baseline">
-                <h4 className="font-bold text-gray-800 mr-2">{email.title}</h4>
-                <p className="text-gray-600 text-sm truncate">- {email.content}</p>
+              <div className="flex-1">
+                <div className="flex justify-between items-center mb-1">
+                  <span className="font-medium text-gray-900">
+                    {email.sentBy}
+                  </span>
+                  <span className="text-gray-500 text-sm">
+                    {new Date(email.date).toLocaleDateString(undefined, {
+                      year: "numeric",
+                      month: "short",
+                      day: "numeric",
+                      hour: "2-digit",
+                      minute: "2-digit",
+                    })}
+                  </span>
+                </div>
+                <div className="flex items-baseline">
+                  <h4
+                    className={`${
+                      email.read ? "font-normal" : "font-bold"
+                    } text-gray-800 mr-2`}
+                  >
+                    {email.title}
+                  </h4>
+                  <span className="text-gray-500 text-sm">
+                    {email.preview}...
+                  </span>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
