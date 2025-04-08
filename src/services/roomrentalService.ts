@@ -70,7 +70,9 @@ export const payment= async(paymentrequest: PaymentRequest): Promise<string> =>{
         body: JSON.stringify(paymentrequest),
     });
     if (!response.ok) {
-      throw new Error(`Lỗi fetch đăng ký phòng`);
+      const errorMessage = await response.text(); 
+      return errorMessage;
+      
     }
     return await response.text();
   } catch (error) {

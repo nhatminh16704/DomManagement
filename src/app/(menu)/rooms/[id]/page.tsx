@@ -15,6 +15,15 @@ import { RoomDetail, getRoomDetail } from "@/services/roomService";
 import authService from "@/services/authService";
 import { payment, registrationRoom } from "@/services/roomrentalService";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { getStudentById, Student } from "@/services/studentService";
 
 export type roomRentalRequest ={
   roomId: number;
@@ -30,7 +39,10 @@ export type PaymentRequest ={
 export default function RoomDetailPage() {
   const { id } = useParams();
   const [roomDetail, setRoomDetail] = useState<RoomDetail | null>(null);
+  const [student,setstudent] = useState<Student|null>(null);
   const [paymentStatus, setPaymentStatus] = useState<boolean | null>(null);
+  const [regist,setRegist] = useState<boolean>(false);
+  
   const role = authService.getRole();
   const [isVisible, setIsVisible] = useState<boolean>(false);
   const userId = authService.getUserId();
@@ -65,14 +77,32 @@ export default function RoomDetailPage() {
         setPaymentStatus(null);
       }, 2000);
   },[paymentStatus]);
+  useEffect(()=>{
+    const fetchStudent = async () => {
+      if (userId) {
+        try {
+          const studentDetail = await getStudentById(userId);
+          setstudent(studentDetail);
+        } catch (error) {
+          console.error("Error fetching student data:", error);
+        }
+      }
+    };
+    
+    fetchStudent();
+  }, [userId]);
 
   if (!roomDetail) {
     return <div className="p-8">Không tìm thấy phòng</div>;
   }
 
-  const { students, devices, room } = roomDetail;
 
+
+  const { students, devices, room } = roomDetail;
   
+  const detailregistrationRoom= async()=>{
+        setRegist(true);
+  }
  
   const handleregistrationRoom= async ()=>{
     if (userId !== null) {
@@ -93,13 +123,19 @@ export default function RoomDetailPage() {
             idRef: Number(registId),
             }
             const path = await payment(paymentRequest);
-            if (path) {
+            if (path.startsWith("http")) {
               window.location.href = path;
+              setErrorMessage(null);
+            }else{
+              setRegist(false);
+              setIsVisible(true);
+              setPaymentStatus(false);
+              setErrorMessage(path);
             }
-            console.log("Đăng ký thành công, ID:", registId);
-            setErrorMessage(null);
+            
           }else{
-            if(registId==="Ngoài thời gian đăng ký" || registId=== "You can't rent more rooms"){
+            if(registId==="Ngoài thời gian đăng ký" || registId=== "You can't rent more rooms" || registId ==="Không thể đăng ký phòng khác giới"){
+              setRegist(false);
               setIsVisible(true);
               setPaymentStatus(false);
               setErrorMessage(registId);
@@ -120,8 +156,8 @@ export default function RoomDetailPage() {
           <div className="text-xl font-bold">Chi tiết phòng {room.roomName}</div>
           
           <div>
-            <button className={room.available>0 && role === "STUDENT"?"px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600":"px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hidden" } 
-           onClick={handleregistrationRoom}
+            <button className={room.available > 0 && role === "STUDENT" && student?.gender ===room.blockType ?"px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600":"px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hidden" } 
+           onClick={detailregistrationRoom}
            >
               Đăng ký
             </button>
@@ -307,6 +343,72 @@ export default function RoomDetailPage() {
           </div>
         </div>
       )}
+
+
+      {(<Dialog open={regist} onOpenChange={(open) => setRegist(open)}>
+        
+        <DialogContent className="sm:max-w-[600px]">
+          <div className="text-center">
+            <DialogHeader>
+              <DialogTitle>Thông tin đăng ký</DialogTitle>
+              <DialogDescription>
+                Đây là thông tin chi tiết của sinh viên
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 py-4 text-sm">
+            <div className="flex items-center">
+              <strong className="mr-2">Mã SV:</strong>
+              <p>{student?.studentCode}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Họ và tên:</strong>
+              <p>{student?.fullName}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Ngày sinh:</strong>
+              <p>{student?.birthday}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Giới tính:</strong>
+              <p>{student?.gender}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Mã phòng:</strong>
+              <p>{room.roomName}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Loại phòng:</strong>
+              <p>{room.typeRoom}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Giá:</strong>
+              <p>{room.price * 6}</p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setRegist(false)}
+               className="border-2 border-gray-500 bg-white text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100"
+            >
+              Đóng
+            </button>
+            <button 
+              type="button"
+              onClick={handleregistrationRoom}
+               className="border-2 border-blue-500 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            >
+              Thanh toán 
+            </button>
+          </DialogFooter>
+        </DialogContent>
+
+        </Dialog>
+      )}
+        
 
     </div>
   );
