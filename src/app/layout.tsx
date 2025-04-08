@@ -9,6 +9,8 @@ import { useEffect, useState } from "react";
 import authService from "@/services/authService";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { UnreadMessagesProvider } from "@/contexts/UnreadMessagesContext";
+
 
 const inter = Inter({ subsets: ["latin"] });
 
@@ -72,15 +74,16 @@ export default function RootLayout({
   return (
     <html lang="en" className="h-full">
       <body className={`${inter.className} flex flex-col h-full`}>
-        <Header />
-        <div className="flex flex-1 h-[calc(100vh-64px)]">
-          {" "}
-          {/* Adjust 64px to match your header height */}
-          <Menu numberMessage={numberMessage}/>
-          <main className="overflow-auto flex-1 p-10 pl-20">{children}</main>
-        </div>
+        <UnreadMessagesProvider>
+          <Header />
+          <div className="flex flex-1 h-[calc(100vh-64px)]">
+            <Menu />
+            <main className="overflow-auto flex-1 p-10 pl-20">{children}</main>
+          </div>
+        </UnreadMessagesProvider>
         <ToastContainer position="bottom-right" autoClose={3000} />
       </body>
     </html>
   );
+  
 }

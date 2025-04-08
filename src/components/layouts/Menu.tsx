@@ -1,6 +1,7 @@
-
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useContext } from "react";
+import { UnreadMessagesContext } from "@/contexts/UnreadMessagesContext";
 
 import {
   HomeIcon,
@@ -11,9 +12,9 @@ import {
   MegaphoneIcon,
   UserCircleIcon,
   Cog6ToothIcon,
-  ArrowLeftOnRectangleIcon,
+  ArrowRightStartOnRectangleIcon,
   UsersIcon,
-  UserGroupIcon
+  UserGroupIcon,
 } from "@heroicons/react/24/outline";
 import { useEffect, useState } from "react";
 import { number } from "zod";
@@ -91,7 +92,7 @@ const menuItems = [
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
-        icon: <ArrowLeftOnRectangleIcon className="w-6 h-6" />,
+        icon: <ArrowRightStartOnRectangleIcon className="w-6 h-6" />,
         label: "Logout",
         href: "/logout",
         visible: ["admin", "teacher", "student", "parent"],
@@ -103,6 +104,9 @@ const menuItems = [
 
 const Menu = ({ numberMessage }: { numberMessage: number }) => {
   const pathname = usePathname();
+  const context = useContext(UnreadMessagesContext);
+  const unreadCount = context?.unreadCount || 0;
+
   return (
     <div className="p-5 relative">
       {menuItems.map((i) => (
@@ -113,34 +117,41 @@ const Menu = ({ numberMessage }: { numberMessage: number }) => {
           {i.items.map((item) => {
             if (item.visible.includes(role)) {
               // Check if current path matches this menu item
-              const isActive = pathname === item.href || (pathname.startsWith(item.href + "/") && item.href !== "/");
+              const isActive =
+                pathname === item.href ||
+                (item.href !== "/" && pathname.startsWith(item.href));
 
               return (
-                <div key={item.label} className="relative">
-                  <Link
-                    href={item.label.toLowerCase() === "logout" ? "/login" : item.href}
-                    onClick={() => {
-                      if (item.label.toLowerCase() === "logout") {
-                        localStorage.removeItem("user");
-                      }
-                    }}
-                    className={`flex items-center justify-center lg:justify-start gap-4 py-2 md:px-2 rounded-md
-                  transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-600 hover:shadow-sm hover:scale-[1.02]
-                  ${isActive
-                        ? 'bg-blue-100 text-blue-600 font-medium shadow-sm'
-                        : 'text-gray-500'}`}
-                  >
-                    {item.icon}
-                    <span className="hidden lg:block">{item.label}</span>
-                  </Link>
-
-                  {/* Show numberMessage as a badge for "Messages" */}
-                  {item.label === "Messages" && numberMessage > 0 && (
-                    <div className="absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-red-500 text-white rounded-full text-xs">
-                      {numberMessage}
-                    </div>
-                  )}
-                </div>
+                <Link
+                  href={
+                    item.label.toLowerCase() === "logout" ? "/login" : item.href
+                  }
+                  key={item.label}
+                  onClick={() => {
+                    if (item.label.toLowerCase() === "logout") {
+                      // Clear login info from localStorage or your auth state management
+                      localStorage.removeItem("user");
+                    }
+                  }}
+                  className={`flex items-center justify-center lg:justify-start gap-4 py-2 md:px-2 rounded-md 
+                transition-all duration-200 ease-in-out hover:bg-blue-100 hover:text-blue-600 hover:shadow-sm hover:scale-[1.02]
+                ${
+                  isActive
+                    ? "bg-blue-100 text-blue-600 font-medium shadow-sm"
+                    : "text-gray-500"
+                }`}
+                >
+                  {item.icon}
+                  <span className="hidden lg:block">
+                    {item.label}
+                    {item.label.toLowerCase() === "messages" &&
+                      unreadCount > 0 && (
+                        <span className="ml-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
+                          {unreadCount > 99 ? "99+" : unreadCount}
+                        </span>
+                      )}
+                  </span>
+                </Link>
               );
             }
             return null;

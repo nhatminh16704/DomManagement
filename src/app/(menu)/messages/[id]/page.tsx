@@ -1,77 +1,76 @@
-"use client"
+'use client';
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'next/navigation';
+import { MessageDetail, getMessageById } from '@/services/messageService';
+import { toast } from 'react-toastify';
+import { ArrowLeftIcon, ClockIcon, UserCircleIcon } from '@heroicons/react/24/outline';
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
-import authService from "@/services/authService";
-import { findMessageByIdForAdmin, getmessagesbyId, message } from "@/services/messageService";
-import { useParams } from "next/navigation";
-import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+export default function MessageDetailPage() {
+  const params = useParams();
+  const messageId = Number(params.id);
+  const [message, setMessage] = useState<MessageDetail | null>(null);
 
-export default function MessageDetail(){
-    const router=useRouter();
-    const {id} = useParams();
-    const [message , setmessage] = useState<message|null>();
-    const userId = Number(authService.getUserId());
-    const role = authService.getRole();
-    useEffect(()=>{
-        const messageID= Number(id);
-        if(isNaN(messageID)||isNaN(userId)) return;
-        if(role==="ADMIN"){
-            findMessageByIdForAdmin(messageID).then((data)=>{
-                setmessage(data)
-            })
-        }else{
-            getmessagesbyId(messageID,userId).then((data)=>{
-                setmessage(data);
-            })
-        }
-        
-    })
+  useEffect(() => {
+    async function fetchMessage() {
+      try {
+        const messageData = await getMessageById(messageId);
+        setMessage(messageData);
+      } catch (error) {
+        toast.error("Failed to load message");
+        console.error("Error fetching message:", error);
+      }
+    }
 
-    return(
-        <div className="h-full flex flex-col bg-gray-100 p-4">
-    <div className="flex justify-between items-center mb-4">
-        <div className="flex space-x-2">
-            <button className="p-2 hover:bg-gray-200 rounded-full" 
-            onClick={() => router.back()}
-            >
-                <svg
-                className="w-5 h-5"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-                xmlns="http://www.w3.org/2000/svg"
-                >
-                <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth="2"
-                    d="M19 11H6l4-4m0 0l-4 4m4-4v12"
-                ></path>
-                </svg>
-            </button>
-        </div>
+    if (messageId) {
+      fetchMessage();
+    }
+  }, [messageId]);
+
+  if (!message) {
+    return (
+      <div className="p-8 max-w-2xl mx-auto text-center">
+        <div className="text-gray-500 text-lg">Message not found</div>
+      </div>
+    );
+  }
+
+  const formattedDate = new Date(message.date).toLocaleString();
+
+  return (
+    <div className="min-h-screen bg-gray-50 p-4 md:p-8">
+      <div className="max-w-3xl mx-auto">
+        <Card className="border border-gray-100 shadow-lg">
+          <CardHeader className="pb-4">
+            <div className="flex items-center justify-between">
+              <button
+                onClick={() => window.history.back()}
+                className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
+              >
+                <ArrowLeftIcon className="h-6 w-6 mr-2" />
+                <span className="font-medium">Back</span>
+              </button>
+              <div className="flex items-center text-sm text-gray-500">
+                <ClockIcon className="h-5 w-5 mr-1.5" />
+                <span>{formattedDate}</span>
+              </div>
+            </div>
+            <CardTitle className="text-3xl font-bold text-gray-900">{message.title}</CardTitle>
+            <div className="flex items-center text-gray-600">
+              <UserCircleIcon className="h-6 w-6 mr-2" />
+              <span className="text-sm">From: {message.sentBy}</span>
+            </div>
+          </CardHeader>
+          
+          <CardContent className="border-t border-gray-100 pt-6">
+            <div className="prose prose-gray max-w-none">
+              <p className="text-gray-700 leading-relaxed">
+                {message.content}
+              </p>
+            </div>
+          </CardContent>
+        </Card>
+      </div>
     </div>
-
-    {/* Nội dung chính */}
-    <div className="flex-grow overflow-y-auto h-[500px] border border-gray-300 rounded-md p-4 bg-white space-y-3">
-    <h1 className="text-xl font-bold">{message?.title}</h1> {/* Tăng kích thước chữ */}
-    <div className="flex justify-between">
-        <span className="font-medium text-gray-900">
-            {message?.sentBy}
-        </span>
-        <span className="text-gray-500 text-sm">
-            {message?.date
-                ? new Date(message?.date).toLocaleDateString("vi-VN")
-                : "Không có ngày"}
-        </span>
-    </div>
-    <p className="text-gray-600 text-sm">{message?.content}</p>
-</div>
-
-</div>
-
-    
-
-
-    )
+  );
 }

@@ -1,132 +1,104 @@
-import { MessageRequest, UseSearchDTO } from "@/app/(menu)/messages/page";
-import { promises } from "dns";
+export type Message = {
+  id: number;
+  title: string;
+  preview: string;
+  sentBy: string;
+  date: Date;
+  read: boolean;
+};
+export type MessageDetail = {
+  id: number;
+  title: string;
+  content: string;
+  sentBy: string;
+  date: Date;
+};
 
+import authService from "@/services/authService";
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/messages";
-export type message = {
-    id: number;
-    title: String;
-    content: String;
-    sentBy : String;
-    date: Date;
-    read: boolean;
-}
+const accountId = authService.getUserId();
 
-const token = localStorage.getItem("token");
-export const getmessages = async(id: number): Promise<message[]> =>{
-    try{
-        if(!token){
-            throw new Error("Không tìm thấy token!");
-        }
-        const response = await fetch(`${API_URL}/${id}`,{
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`, 
-                "Content-Type": "application/json"
-            }
-        });
-        const messages = await  response.json();
-        return messages;
-    }catch(e){
-        console.error("lỗi khi lấy tin nhắn của 1 người: ",e);
-        return []
-    }   
-}
-
-export const getmessagesBySender= async(id: number): Promise<message[]>=>{
-    try{
-        if(!token){
-            throw new Error("Không tìm thấy token!");
-        }
-        const response = await fetch(`${API_URL}/sent/${id}`,{
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`, 
-                "Content-Type": "application/json"
-            }
-        });
-        const messages = await  response.json();
-        return messages;
-    }catch(e){
-        console.error("lỗi khi lấy tin nhắn của 1 người: ",e);
-        return []
-    }   
-}
-
-export const getmessagesbyId = async(id: number,receiver: number): Promise<message| null> =>{
-    try{
-        if(!token){
-            throw new Error("Không tìm thấy token!");
-        }
-        const response = await fetch(`${API_URL}/${id}/${receiver}`,{
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`, 
-                "Content-Type": "application/json"
-            }
-        });
-        const messages = await  response.json();
-        return messages;
-    }catch(e){
-        console.error("lỗi khi lấy tin nhắn của 1 người: ",e);
-        return null
-    }  
-}
-
-export const createmessage = async(message: MessageRequest): Promise<string> =>{
-    if(!token){
-        throw new Error("Không tìm thấy token!");
-    }
-    const response = await fetch(API_URL+ "/create",{
-        method: "POST",
-        headers: {
-            "Authorization": `Bearer ${token}`, 
-            "Content-Type": "application/json"
-        },
-        body: JSON.stringify(message),
+export async function getMessages(): Promise<Message[]> {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/account/${accountId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
     });
     if (!response.ok) {
-        throw new Error("Lỗi khi thêm thông báo ");
+      throw new Error("Error fetching messages");
     }
-    return response.text();
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching students:", error);
+    throw error;
+  }
 }
 
-export const searchUser = async(key: String): Promise<UseSearchDTO[]> =>{
-    try{
-        if(!token){
-            throw new Error("Không tìm thấy token!");
-        }
-        const response = await fetch(`${API_URL}/users/search?keyword=${key}`,{
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`, 
-                "Content-Type": "application/json"
-            }
-        });
-        const messagesdto = await  response.json();
-        return messagesdto;
-    }catch(e){
-        console.error("lỗi khi lấy tin nhắn của 1 người: ",e);
-        return []
-    }  
+export async function getMessageById(messageId: number): Promise<MessageDetail> {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/${messageId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error(`Error fetching message with id ${messageId}`);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching message:", error);
+    throw error;
+  }
 }
 
-export const findMessageByIdForAdmin = async(id: number): Promise<message|null> =>{
-    try{
-        if(!token){
-            throw new Error("Không tìm thấy token!");
-        }
-        const response = await fetch(`${API_URL}/findId/${id}`,{
-            method: "GET",
-            headers: {
-                "Authorization": `Bearer ${token}`, 
-                "Content-Type": "application/json"
-            }
-        });
-        const messagesdto = await  response.json();
-        return messagesdto;
-    }catch(e){
-        console.error("lỗi khi lấy tin nhắn của 1 người: ",e);
-        return null
-    }  
+export async function markMessageAsRead(messageId: number): Promise<void> {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/${messageId}/read`, {
+      method: 'PATCH',
+      headers: {
+        'Authorization': `Bearer ${token}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ accountId })
+    });
+    
+    if (!response.ok) {
+      throw new Error(`Error marking message ${messageId} as read`);
+    }
+  } catch (error) {
+    console.error("Error updating message read status:", error);
+    throw error;
+  }
 }
+
+export async function getUnreadMessagesCount(): Promise<number> {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/unread/${accountId}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      throw new Error("Error fetching unread messages count");
+    }
+    const count = await response.text();
+    return parseInt(count);
+  } catch (error) {
+    console.error("Error fetching unread messages count:", error);
+    throw error;
+  }
+}
+
+
+
+
+
+
+
+
 
