@@ -1,6 +1,6 @@
 import Link from "next/link";
 import Image from "next/image";
-
+import { ChatBubbleLeftIcon, MegaphoneIcon } from "@heroicons/react/24/outline";
 
 const Header = () => {
   return (
@@ -10,7 +10,7 @@ const Header = () => {
           href="/"
           className="flex items-center justify-center lg:justify-start gap-2"
         >
-          <Image src="/logo.png" alt="logo" width={50} height={50} /> 
+          <Image src="/logo.png" alt="logo" width={50} height={50} />
           <span className="hidden lg:block font-bold">DomHub</span>
         </Link>
       </div>
@@ -25,15 +25,16 @@ const Header = () => {
             />
           </div>
           <div className="flex items-center gap-6 justify-end w-full">
-            <div className="bg-white p-2 rounded w-15 h-15  flex items-center justify-center cursor-pointer hover:bg-blue-100 transition-colors">
-              <Image src="/message.png" alt="" width={30} height={30} />
-            </div>
-            <div className="bg-white p-2 rounded w-15 h-15 flex items-center justify-center cursor-pointer relative hover:bg-blue-100 transition-colors">
-              <Image src="/announcement.png" alt="" width={30} height={30} />
-              <div className="absolute -top-3 -right-3 w-5 h-5 flex items-center justify-center bg-red-500 text-white rounded-full text-xs">
-                1
+            <Link href="/messages" className="block">
+              <div className="bg-white p-2 rounded w-15 h-15 flex items-center justify-center cursor-pointer hover:bg-blue-100 hover:shadow-md transition-all duration-200">
+                <ChatBubbleLeftIcon className="w-[30px] h-[30px] text-gray-600 hover:text-blue-600" />
               </div>
-            </div>
+            </Link>
+            <Link href="/announcements" className="block">
+              <div className="bg-white p-2 rounded w-15 h-15 flex items-center justify-center cursor-pointer relative hover:bg-blue-100 hover:shadow-md transition-all duration-200">
+                <MegaphoneIcon className="w-[30px] h-[30px] text-gray-600 hover:text-blue-600" />
+              </div>
+            </Link>
             <div className="flex flex-col">
               <span className="text-xs leading-3 font-medium">Ming</span>
               <span className="text-[10px] text-gray-500 text-right">

@@ -1,3 +1,6 @@
+"use client";
+
+import { useEffect, useState } from "react";
 import {
   DocumentTextIcon,
   CurrencyDollarIcon,
@@ -8,53 +11,72 @@ import {
 } from "@heroicons/react/24/outline";
 import Chart from "@/components/charts/Chart";
 import DonutChart from "@/components/charts/DonutChart";
+import { Dashboard, getDashboard } from "@/services/dashboardService";
 
-const stats = [
-  {
-    title: "Reports",
-    value: "59",
-    icon: <DocumentTextIcon className="w-8 h-8 text-blue-500" />,
-    bgColor: "bg-blue-100/80",
-    textColor: "text-blue-500",
-  },
-  {
-    title: "Revenue",
-    value: "$96k",
-    icon: <CurrencyDollarIcon className="w-8 h-8 text-green-500" />,
-    bgColor: "bg-green-100/80",
-    textColor: "text-green-500",
-  },
-  {
-    title: "Events",
-    value: "696",
-    icon: <CalendarIcon className="w-8 h-8 text-red-500" />,
-    bgColor: "bg-red-100/80",
-    textColor: "text-red-500",
-  },
-  {
-    title: "Rooms",
-    value: "356",
-    icon: <BuildingOfficeIcon className="w-8 h-8 text-blue-400" />,
-    bgColor: "bg-blue-200/80",
-    textColor: "text-blue-400",
-  },
-  {
-    title: "Students",
-    value: "3,560",
-    icon: <UserGroupIcon className="w-8 h-8 text-orange-500" />,
-    bgColor: "bg-orange-100/80",
-    textColor: "text-orange-500",
-  },
-  {
-    title: "Staffs",
-    value: "96",
-    icon: <UsersIcon className="w-8 h-8 text-purple-500" />,
-    bgColor: "bg-purple-100/80",
-    textColor: "text-purple-500",
-  },
-];
+
 
 export default function Home() {
+  const [dashboardData, setDashboardData] = useState<Dashboard | null>(null);
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      try {
+        const data = await getDashboard();
+        setDashboardData(data);
+      } catch (error) {
+        console.error("Error fetching dashboard data:", error);
+      }
+    };
+
+    fetchDashboardData();
+  }, []);
+
+  const stats = [
+    {
+      title: "Báo cáo",
+      value: dashboardData?.reportCount || "0",
+      icon: <DocumentTextIcon className="w-8 h-8 text-blue-500" />,
+      bgColor: "bg-blue-100/80",
+      textColor: "text-blue-500",
+    },
+    {
+      title: "Doanh thu",
+      value: dashboardData ? `$${dashboardData.revenue.toLocaleString()}` : "$0",
+      icon: <CurrencyDollarIcon className="w-8 h-8 text-green-500" />,
+      bgColor: "bg-green-100/80",
+      textColor: "text-green-500",
+    },
+    {
+      title: "Sự kiện",
+      value: "69",
+      icon: <CalendarIcon className="w-8 h-8 text-red-500" />,
+      bgColor: "bg-red-100/80",
+      textColor: "text-red-500",
+    },
+    {
+      title: "Phòng",
+      value: dashboardData?.roomCount?.toString() || "0",
+      icon: <BuildingOfficeIcon className="w-8 h-8 text-blue-400" />,
+      bgColor: "bg-blue-200/80",
+      textColor: "text-blue-400",
+    },
+    {
+      title: "Sinh viên",
+      value: dashboardData?.studentCount?.toLocaleString() || "0",
+      icon: <UserGroupIcon className="w-8 h-8 text-orange-500" />,
+      bgColor: "bg-orange-100/80",
+      textColor: "text-orange-500",
+    },
+    {
+      title: "Nhân viên",
+      value: dashboardData?.staffCount?.toString() || "0",
+      icon: <UsersIcon className="w-8 h-8 text-purple-500" />,
+      bgColor: "bg-purple-100/80",
+      textColor: "text-purple-500",
+    },
+  ];
+
+
+
   return (
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-6 gap-4 mb-5">
@@ -78,9 +100,12 @@ export default function Home() {
           <Chart />
         </div>
         <div className="w-full h-90">
-          <div className="flex justify-between items-center mb-2 ">
-            <DonutChart />
-          </div>
+            <div className="flex justify-between items-center mb-2 ">
+            <DonutChart 
+              total={dashboardData?.totalRoomCapacity}
+              available={dashboardData?.availableRoomCount}
+            />
+            </div>
         </div>
       </div>
     </div>
