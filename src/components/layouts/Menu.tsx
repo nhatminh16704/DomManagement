@@ -25,48 +25,56 @@ const menuItems = [
       {
         icon: <HomeIcon className="w-6 h-6" />,
         label: "Home",
+        name: "Trang chủ",
         href: "/",
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
         icon: <UserGroupIcon className="w-6 h-6" />,
         label: "Students",
-        href: "/students",
+        name: "Sinh viên",
+        href: "/students",      
         visible: ["admin", "teacher"],
       },
       {
         icon: <UsersIcon className="w-6 h-6" />,
         label: "Staffs",
+        name: "Nhân viên",
         href: "/staffs",
         visible: ["admin", "teacher"],
       },
       {
         icon: <BuildingOfficeIcon className="w-6 h-6" />,
         label: "Rooms",
+        name: "Phòng",
         href: "/rooms",
         visible: ["admin", "teacher"],
       },
       {
         icon: <DocumentTextIcon className="w-6 h-6" />,
         label: "Reports",
+        name: "Báo cáo",
         href: "/reports",
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
         icon: <CalendarIcon className="w-6 h-6" />,
-        label: "Events",
-        href: "/events",
+        label: "Billing",
+        name: "Hóa đơn",
+        href: "/bills",
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
         icon: <ChatBubbleLeftIcon className="w-6 h-6" />,
         label: "Messages",
+        name: "Tin nhắn",
         href: "/messages",
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
         icon: <MegaphoneIcon className="w-6 h-6" />,
         label: "Announcements",
+        name: "Thông báo",
         href: "/announcements",
         visible: ["admin", "teacher", "student", "parent"],
       },
@@ -78,18 +86,21 @@ const menuItems = [
       {
         icon: <UserCircleIcon className="w-6 h-6" />,
         label: "Profile",
+        name: "Hồ sơ",
         href: "/profile",
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
         icon: <Cog6ToothIcon className="w-6 h-6" />,
         label: "Settings",
+        name: "Cài đặt",
         href: "/settings",
         visible: ["admin", "teacher", "student", "parent"],
       },
       {
         icon: <ArrowRightStartOnRectangleIcon className="w-6 h-6" />,
         label: "Logout",
+        name: "Đăng xuất",
         href: "/logout",
         visible: ["admin", "teacher", "student", "parent"],
       },
@@ -138,7 +149,7 @@ const Menu = () => {
                 >
                   {item.icon}
                   <span className="hidden lg:block">
-                    {item.label}
+                    {item.name}
                     {item.label.toLowerCase() === "messages" &&
                       unreadCount > 0 && (
                         <span className="ml-2 bg-red-500 text-white text-xs px-1.5 py-0.5 rounded-full">
