@@ -21,6 +21,12 @@ export type UseSearchDTO = {
   username: string;
 }
 
+export type RoomSearchDTO ={
+  id: number;
+  name: string;
+  userid: number[];
+}
+
 export type MessageRequest  ={
   title: string;
   content: string;
@@ -133,7 +139,25 @@ export const searchUser = async(key: String): Promise<UseSearchDTO[]> =>{
       const messagesdto = await  response.json();
       return messagesdto;
   }catch(e){
-      console.error("lỗi khi lấy tin nhắn của 1 người: ",e);
+      console.error("lỗi khi tim nguoi gui: ",e);
+      return []
+  }  
+}
+
+export const roomSearch = async(key: string): Promise<RoomSearchDTO[]>=>{
+  try{
+    const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/search/room?keyword=${key}`,{
+          method: "GET",
+          headers: {
+              "Authorization": `Bearer ${token}`, 
+              "Content-Type": "application/json"
+          }
+      });
+      const messagesdto = await  response.json();
+      return messagesdto;
+  }catch(e){
+      console.error("lỗi khi tìm phòng: ",e);
       return []
   }  
 }

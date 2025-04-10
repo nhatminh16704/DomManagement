@@ -8,6 +8,8 @@ import {
   UseSearchDTO,
   MessageRequest,
   createmessage,
+  RoomSearchDTO,
+  roomSearch,
 } from "@/services/messageService";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
@@ -24,13 +26,13 @@ export default function Messages() {
   const router = useRouter();
 
   const [userSearch, setUserSearch] = useState<UseSearchDTO[]>([]);
+  const [roomsearch, setroomsearch] = useState<RoomSearchDTO[]>([]);
   const [showForm, setShowForm] = useState(false);
   const [formData, setFormData] = useState({
     title: "",
     content: "",
     receivers: [] as number[],
   });
-  const [inputValue, setInputValue] = useState("");
   const role = authService.getRole();
   const userId = authService.getUserId();
 
@@ -62,13 +64,28 @@ export default function Messages() {
     });
   }
 
+  const getRoomSearch = (key: string)=>{
+    roomSearch(key).then((data)=>{
+      setroomsearch(data)
+    }).catch((e)=>{
+      console.error("lỗi khi lấy danh sách roomsearch: ", e);
+    });
+  }
+
   const debouncedSearch = debounce((value: string) => {
     getUserSearch(value);
   }, 100);
 
-  const handleInputChange = (inputValue: string) => {
-    setInputValue(inputValue);
+  const handleRoomSearch = debounce((value: string) => {
+    getRoomSearch(value);
+    console.log(roomsearch);
+  }, 100);
+
+  const handleInputChangeUserSearch = (inputValue: string) => {
     debouncedSearch(inputValue);
+  };
+  const handleInputChangeRoomSearch = (inputValue: string) => {
+    handleRoomSearch(inputValue);
   };
   
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -268,12 +285,45 @@ export default function Messages() {
                 isClearable
                 isMulti
                 isSearchable
-                onInputChange={(newValue) => handleInputChange(newValue)}
-                onChange={(selectedOption) => 
+                onInputChange={(newValue) => handleInputChangeUserSearch(newValue)}
+                onChange={(selectedOption) => {
+                    const userIds = selectedOption ? selectedOption.map(option => option.value) : [];
+                    const newReceivers = Array.from(new Set([...formData.receivers, ...userIds])); // loại trùng
+                  
+                    setFormData({
+                      ...formData,
+                      receivers: newReceivers
+                    });
+                }}
+              />
+            </div>
+
+            <div>
+              <label htmlFor="type" className="block text-black mb-1">Gửi Đến Phòng</label>
+              <Select
+                id="type"
+                className="w-full"
+                options={roomsearch.map((item) => ({ value: item.id, label: item.name }))}
+                placeholder="Nhập và chọn"
+                isClearable
+                isMulti
+                isSearchable
+                menuPlacement="top"
+                onInputChange={(newValue) => handleInputChangeRoomSearch(newValue)}
+                onChange={(selectedOption) => {
+                  const selectedRooms = selectedOption || [];
+                  const allUserIds = selectedRooms.flatMap((option) => {
+                    const room = roomsearch.find((r) => r.id === option.value);
+                    console.error(room ? room.userid : []);
+                    return room ? room.userid : [];
+                    
+                  });
+
                   setFormData({
                     ...formData,
-                    receivers: selectedOption ? selectedOption.map(option => option.value) : []
-                  })
+                    receivers: Array.from(new Set([...formData.receivers, ...allUserIds]))
+                  });
+                }
                 }
               />
             </div>
