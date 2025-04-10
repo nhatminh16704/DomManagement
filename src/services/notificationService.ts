@@ -67,7 +67,6 @@ export const getnotificationtype = async(type:string): Promise<notification[]> =
 
 export const addnotification = async(notification: createNotification): Promise< String > =>{
     if (!token) {
-        console.error("Không có token, cần đăng nhập!");
         throw new Error("Người dùng chưa đăng nhập.");
     }
     const response = await fetch(API_URL+ "/create",{

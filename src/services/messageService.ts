@@ -6,6 +6,8 @@ export type Message = {
   date: Date;
   read: boolean;
 };
+
+
 export type MessageDetail = {
   id: number;
   title: string;
@@ -14,14 +16,35 @@ export type MessageDetail = {
   date: Date;
 };
 
+export type UseSearchDTO = {
+  id: number;
+  username: string;
+}
+
+export type MessageRequest  ={
+  title: string;
+  content: string;
+  sentBy:  number;
+  receivers: number[] ;
+}
+
 import authService from "@/services/authService";
+import { url } from "inspector";
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/messages";
-const accountId = authService.getUserId();
+
 
 export async function getMessages(): Promise<Message[]> {
+  const accountId = authService.getUserId();
+  const role = authService.getRole();
+  let path = "";
+  if(role ==="ADMIN"){
+    path = `${API_URL}/sent/${accountId}`;
+  }else{
+    path = `${API_URL}/account/${accountId}`;
+  }
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/account/${accountId}`, {
+    const response = await fetch(path, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -57,6 +80,7 @@ export async function getMessageById(messageId: number): Promise<MessageDetail> 
 export async function markMessageAsRead(messageId: number): Promise<void> {
   try {
     const token = localStorage.getItem('token');
+    const accountId = authService.getUserId();
     const response = await fetch(`${API_URL}/${messageId}/read`, {
       method: 'PATCH',
       headers: {
@@ -78,6 +102,7 @@ export async function markMessageAsRead(messageId: number): Promise<void> {
 export async function getUnreadMessagesCount(): Promise<number> {
   try {
     const token = localStorage.getItem('token');
+    const accountId = authService.getUserId();
     const response = await fetch(`${API_URL}/unread/${accountId}`, {
       headers: {
         'Authorization': `Bearer ${token}`
@@ -94,11 +119,38 @@ export async function getUnreadMessagesCount(): Promise<number> {
   }
 }
 
+export const searchUser = async(key: String): Promise<UseSearchDTO[]> =>{
+  try{
+    const token = localStorage.getItem('token');
+      const response = await fetch(`${API_URL}/users/search?keyword=${key}`,{
+          method: "GET",
+          headers: {
+              "Authorization": `Bearer ${token}`, 
+              "Content-Type": "application/json"
+          }
+      });
+      const messagesdto = await  response.json();
+      return messagesdto;
+  }catch(e){
+      console.error("lỗi khi lấy tin nhắn của 1 người: ",e);
+      return []
+  }  
+}
 
-
-
-
-
-
+export const createmessage = async(message: MessageRequest): Promise<string> =>{
+  const token = localStorage.getItem('token');
+  const response = await fetch(API_URL+ "/create",{
+      method: "POST",
+      headers: {
+          "Authorization": `Bearer ${token}`, 
+          "Content-Type": "application/json"
+      },
+      body: JSON.stringify(message),
+  });
+  if (!response.ok) {
+      throw new Error("Lỗi khi thêm tin nhắn ");
+  }
+  return response.text();
+}
 
 

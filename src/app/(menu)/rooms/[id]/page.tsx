@@ -114,7 +114,7 @@ export default function RoomDetailPage() {
       console.log(request);
   
       try {
-        const registId = await registrationRoom(request);
+        const registId = await registrationRoom(request); 
         if(registId!=null){
           if(!isNaN(Number(registId))){
             const paymentRequest: PaymentRequest={

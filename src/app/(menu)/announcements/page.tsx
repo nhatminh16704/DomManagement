@@ -1,7 +1,7 @@
 "use client";
 import React from 'react'
-  import { useState, useEffect } from 'react';
-  import { useRouter } from "next/navigation";
+import { useState, useEffect } from 'react';
+import { useRouter } from "next/navigation";
 import { Button } from "@/components/ui/button";
 import Select from "react-select";
 import { addnotification, createNotification, getnotification, notification } from '@/services/notificationService';
@@ -31,9 +31,11 @@ export default function Announcements() {
       content: "",
       type: "", 
     });
+
   const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     };
+    
   const addNotification = async (e: React.FormEvent) => {
       e.preventDefault();
   
