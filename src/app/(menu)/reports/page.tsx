@@ -249,7 +249,15 @@ export default function Reports() {
                   {report.status}
                 </span>
               </TableCell>
-              <TableCell>{report.sentDate}</TableCell>
+                <TableCell>
+                {new Date(report.sentDate).toLocaleString('vi-VN', {
+                  year: 'numeric',
+                  month: 'short',
+                  day: 'numeric',
+                  hour: '2-digit',
+                  minute: '2-digit'
+                })}
+                </TableCell>
               <TableCell>
                 <div className="flex gap-3">
                   <Button

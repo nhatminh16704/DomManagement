@@ -52,7 +52,14 @@ export default function LoginForm() {
 
       // Gọi AuthService để đăng nhập
       await authService.login(credentials);
-
+      const role = authService.getRole();
+      // Redirect based on user role
+      if (role === "ADMIN") {
+        router.push("/");
+      } else {
+        router.push("/profile");
+        return;
+      }
       router.push("/");
 
     } catch (err: Error | unknown) {

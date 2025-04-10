@@ -16,8 +16,9 @@ import {
   UsersIcon,
   UserGroupIcon,
 } from "@heroicons/react/24/outline";
+import authService from "@/services/authService";
 
-const role = "admin"; // Change this to "teacher", "student", or "parent" to see the changes
+
 const menuItems = [
   {
     title: "MENU",
@@ -27,56 +28,56 @@ const menuItems = [
         label: "Home",
         name: "Trang chủ",
         href: "/",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["ADMIN"],
       },
       {
         icon: <UserGroupIcon className="w-6 h-6" />,
         label: "Students",
         name: "Sinh viên",
         href: "/students",      
-        visible: ["admin", "teacher"],
+        visible: ["ADMIN", "STAFF"],
       },
       {
         icon: <UsersIcon className="w-6 h-6" />,
         label: "Staffs",
         name: "Nhân viên",
         href: "/staffs",
-        visible: ["admin", "teacher"],
+        visible: ["ADMIN"],
       },
       {
         icon: <BuildingOfficeIcon className="w-6 h-6" />,
         label: "Rooms",
         name: "Phòng",
         href: "/rooms",
-        visible: ["admin", "teacher"],
+        visible: ["ADMIN", "STUDENT", "STAFF"],
       },
       {
         icon: <DocumentTextIcon className="w-6 h-6" />,
         label: "Reports",
         name: "Báo cáo",
         href: "/reports",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["ADMIN", "STAFF", "STUDENT"],
       },
       {
         icon: <CalendarIcon className="w-6 h-6" />,
         label: "Billing",
         name: "Hóa đơn",
         href: "/bills",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["ADMIN", "STUDENT"],
       },
       {
         icon: <ChatBubbleLeftIcon className="w-6 h-6" />,
         label: "Messages",
         name: "Tin nhắn",
         href: "/messages",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["ADMIN", "STAFF", "STUDENT"],
       },
       {
         icon: <MegaphoneIcon className="w-6 h-6" />,
         label: "Announcements",
         name: "Thông báo",
         href: "/announcements",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["ADMIN", "STUDENT", "STAFF"],
       },
     ],
   },
@@ -88,21 +89,21 @@ const menuItems = [
         label: "Profile",
         name: "Hồ sơ",
         href: "/profile",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["ADMIN", "STAFF", "STUDENT"],
       },
       {
         icon: <Cog6ToothIcon className="w-6 h-6" />,
         label: "Settings",
         name: "Cài đặt",
         href: "/settings",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["ADMIN", "STUDENT", "STAFF"],
       },
       {
         icon: <ArrowRightStartOnRectangleIcon className="w-6 h-6" />,
         label: "Logout",
         name: "Đăng xuất",
         href: "/logout",
-        visible: ["admin", "teacher", "student", "parent"],
+        visible: ["ADMIN", "STAFF", "STUDENT"],
       },
     ],
   },
@@ -112,6 +113,7 @@ const Menu = () => {
   const pathname = usePathname();
   const context = useContext(UnreadMessagesContext);
   const unreadCount = context?.unreadCount || 0;
+  const role = authService.getRole();
 
   return (
     <div className="p-5">
@@ -121,7 +123,7 @@ const Menu = () => {
             {i.title}
           </span>
           {i.items.map((item) => {
-            if (item.visible.includes(role)) {
+            if (role && item.visible.includes(role)) {
               // Check if current path matches this menu item
               const isActive =
                 pathname === item.href ||

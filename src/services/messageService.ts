@@ -16,10 +16,11 @@ export type MessageDetail = {
 
 import authService from "@/services/authService";
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/messages";
-const accountId = authService.getUserId();
+
 
 export async function getMessages(): Promise<Message[]> {
   try {
+    const accountId = authService.getUserId();
     const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/account/${accountId}`, {
       headers: {
@@ -56,6 +57,7 @@ export async function getMessageById(messageId: number): Promise<MessageDetail> 
 
 export async function markMessageAsRead(messageId: number): Promise<void> {
   try {
+    const accountId = authService.getUserId();
     const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/${messageId}/read`, {
       method: 'PATCH',
@@ -77,6 +79,7 @@ export async function markMessageAsRead(messageId: number): Promise<void> {
 
 export async function getUnreadMessagesCount(): Promise<number> {
   try {
+    const accountId = authService.getUserId();
     const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/unread/${accountId}`, {
       headers: {

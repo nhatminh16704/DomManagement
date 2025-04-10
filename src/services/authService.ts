@@ -96,6 +96,12 @@ class AuthService {
     if (!payload || !payload.exp) return true;
     return payload.exp * 1000 < Date.now(); // Chuyển từ giây sang mili giây
   }
+
+  // Lấy tên người dùng/subject từ token
+  getUsername(): string | null {
+    const payload = this.getPayload();
+    return payload?.sub || null;
+  }
 }
 
 export default new AuthService(); // Export instance singleton

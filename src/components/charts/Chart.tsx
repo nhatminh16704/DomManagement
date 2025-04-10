@@ -8,11 +8,11 @@ const RevenueChart: React.FC = () => {
 
   const periodData = {
     "first-half": {
-      categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
+      categories: ["Thg 1", "Thg 2", "Thg 3", "Thg 4", "Thg 5", "Thg 6"],
       data: [1.5, 2.8, 2.1, 3.5, 1.2, 0.8]
     },
     "second-half": {
-      categories: ["Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+      categories: ["Thg 7", "Thg 8", "Thg 9", "Thg 10", "Thg 11", "Thg 12"],
       data: [0.9, 1.8, 2.7, 3.2, 2.5, 3.9]
     }
   };
@@ -38,7 +38,7 @@ const RevenueChart: React.FC = () => {
     yaxis: { 
       labels: { 
         show: true,
-        formatter: (value) => `$${value}k` 
+        formatter: (value) => `${value * 25} tr`, 
       },
     },
     tooltip: { enabled: true },
@@ -46,7 +46,7 @@ const RevenueChart: React.FC = () => {
 
   const series = [
     {
-      name: "Earnings",
+      name: "Doanh thu",
       data: periodData[period as keyof typeof periodData].data,
     },
   ];
@@ -60,17 +60,17 @@ const RevenueChart: React.FC = () => {
       <div className="flex justify-between items-center mb-2">
         <div>
           <h2 className="text-lg font-semibold text-gray-800">
-            Revenue Updates
+            Cập Nhật Thu Phí
           </h2>
-          <p className="text-sm text-gray-500">Overview of profit</p>
+          <p className="text-sm text-gray-500">Tổng quan tiền thu phí theo tháng</p>
         </div>
         <select 
           className="border border-blue-300 rounded-md px-3 py-1 text-sm text-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-400"
           value={period}
           onChange={handlePeriodChange}
         >
-          <option value="first-half">Jan - Jun 2024</option>
-          <option value="second-half">Jul - Dec 2024</option>
+            <option value="first-half">Thg 1 - Thg 6 {new Date().getFullYear()}</option>
+            <option value="second-half">Thg 7 - Thg 12 {new Date().getFullYear()}</option>
         </select>
       </div>
 
@@ -84,13 +84,13 @@ const RevenueChart: React.FC = () => {
               <span className="block w-5 h-5 bg-blue-500 rounded-md"></span>
             </div>
             <div>
-              <p className="text-2xl font-bold text-blue-700">$63,489.50</p>
-              <p className="text-sm text-gray-500">Total Earnings</p>
+              <p className="text-2xl font-bold text-blue-700">636,49 tr</p>
+              <p className="text-sm text-gray-500">Tổng Thu</p>
             </div>
           </div>
           <div className="p-3 bg-indigo-50 rounded-xl">
-            <p className="text-sm text-gray-500">Earnings this month</p>
-            <p className="text-xl font-semibold text-indigo-600">$48,820</p>
+            <p className="text-sm text-gray-500">Tổng thu tháng này</p>
+            <p className="text-xl font-semibold text-indigo-600">48,820 tr</p>
           </div>
         </div>
       </div>
