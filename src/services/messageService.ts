@@ -79,6 +79,7 @@ export async function getMessageById(messageId: number): Promise<MessageDetail> 
 
 export async function markMessageAsRead(messageId: number): Promise<void> {
   try {
+    
     const token = localStorage.getItem('token');
     const accountId = authService.getUserId();
     const response = await fetch(`${API_URL}/${messageId}/read`, {
@@ -87,7 +88,7 @@ export async function markMessageAsRead(messageId: number): Promise<void> {
         'Authorization': `Bearer ${token}`,
         'Content-Type': 'application/json'
       },
-      body: JSON.stringify({ accountId })
+      body: JSON.stringify({accountId})
     });
     
     if (!response.ok) {

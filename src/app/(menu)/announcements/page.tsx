@@ -21,7 +21,7 @@ export default function Announcements() {
   const [allNotifications, setAllNotifications] = useState<notification[]>([]);
   const [notifications, setnotification] = useState<notification[]>([]);
   const [selectedNotification, setSelectedNotification] = useState<notification | null>(null);
-  const typeNotification= ['GENERAL','BILLING','MAINTENANCE','SECURITY','EVENT','RULES','URGENT']; 
+  const typeNotification= ['MAINTENANCE','SECURITY','RULES','URGENT']; 
   const [selected, setSelected] = useState<String>("");
   const [selectKey, setSelectKey] = useState(0);
   const userId = authService.getUserId();
