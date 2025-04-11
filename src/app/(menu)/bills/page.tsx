@@ -2,6 +2,7 @@
 
 import AdminBillTable from "@/components/bills/AdminBillTable";
 import authService from "@/services/authService";
+import StudentBillTable from "@/components/bills/StudentBillTable";
 
 export default function BillsPage() {
   const userRole = authService.getRole();
@@ -10,13 +11,7 @@ export default function BillsPage() {
     <div>
       {userRole === 'ADMIN' ? (
         <AdminBillTable />
-      ) : (
-        <div>
-          <h2 className="text-xl mb-4">Student Bill Table</h2>
-          <p>Your billing information appears here.</p>
-          {/* Replace with your actual student bill component */}
-        </div>
-      )}
+      ) : (<StudentBillTable/>)}
     </div>
   );
 }
