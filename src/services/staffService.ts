@@ -53,6 +53,29 @@ export async function getStaffById(staffId: number): Promise<Staff> {
   }
 }
 
+export async function getStaffProfile(): Promise<Staff> {
+  try {
+    const token = localStorage.getItem("token");
+
+    const response = await fetch(`${API_URL}/profile`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(errorMessage || "Lỗi khi lấy thông tin hồ sơ nhân viên");
+    }
+
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching staff profile:", error);
+    throw error;
+  }
+}
+
+
 export async function createStaff(staff: Omit<Staff, 'id'>): Promise<string> {
   try {
     const token = localStorage.getItem('token');
@@ -117,6 +140,44 @@ export async function deleteStaff(id: number): Promise<string> {
     return await response.text();
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : String(error));
+  }
+}
+
+export async function updateStaffProfile(data: { email: string; phoneNumber: string }) {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error("Chưa đăng nhập!");
+
+  const response = await fetch(`${API_URL}/profile`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorMessage = await response.text();
+    throw new Error(errorMessage || "Lỗi khi cập nhật thông tin nhân viên");
+  }
+}
+
+export async function changeStaffPassword(data: { currentPassword: string; newPassword: string }) {
+  const token = localStorage.getItem('token');
+  if (!token) throw new Error("Chưa đăng nhập!");
+
+  const response = await fetch(`${API_URL}/password`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": `Bearer ${token}`,
+    },
+    body: JSON.stringify(data),
+  });
+
+  if (!response.ok) {
+    const errorMessage = await response.text();
+    throw new Error(errorMessage || "Lỗi khi đổi mật khẩu nhân viên");
   }
 }
 

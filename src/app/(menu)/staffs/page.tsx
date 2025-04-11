@@ -22,7 +22,7 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { getStaffs, deleteStaff, Staff } from "@/services/staffService"; // TO DO: deleteStaff
+import { getStaffs, deleteStaff, Staff } from "@/services/staffService";
 import { Eye, Trash2, PenSquare } from "lucide-react";
 import AddStaffModal from "@/components/staff/AddStaffModal";
 import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
@@ -159,8 +159,7 @@ export default function Staffs() {
         <TableCaption>Danh sách nhân viên.</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Họ</TableHead>
-            <TableHead>Tên</TableHead>
+            <TableHead>Họ và tên</TableHead>
             <TableHead>Ngày sinh</TableHead>
             <TableHead>Giới tính</TableHead>
             <TableHead>Chức vụ</TableHead>
@@ -173,8 +172,7 @@ export default function Staffs() {
         <TableBody>
           {currentStaffs.map((staff) => (
             <TableRow key={staff.id}>
-              <TableCell>{staff.lastName}</TableCell>
-              <TableCell>{staff.firstName}</TableCell>
+              <TableCell>{`${staff.lastName} ${staff.firstName}`}</TableCell>
               <TableCell>{staff.birthday}</TableCell>
               <TableCell>{staff.gender}</TableCell>
               <TableCell>{staff.position}</TableCell>

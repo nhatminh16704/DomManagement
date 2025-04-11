@@ -3,7 +3,6 @@
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { z } from "zod"
-
 import { Button } from "@/components/ui/button"
 import {
   Form,
@@ -14,6 +13,8 @@ import {
   FormMessage,
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
+import { toast } from "react-toastify";
+import { updateProfile, changePassword } from "@/services/userService";
 
 const profileFormSchema = z.object({
   phone: z.string().min(1, { message: "Số điện thoại không được để trống" }),
@@ -22,7 +23,7 @@ const profileFormSchema = z.object({
 
 const securityFormSchema = z.object({
   currentPassword: z.string().min(1, { message: "Mật khẩu hiện tại không được để trống" }),
-  newPassword: z.string().min(8, { message: "Mật khẩu mới phải có ít nhất 8 ký tự" }),
+  newPassword: z.string().min(6, { message: "Mật khẩu mới phải có ít nhất 6 ký tự" }),
   confirmPassword: z.string().min(1, { message: "Xác nhận mật khẩu không được để trống" }),
 }).refine((data) => data.newPassword === data.confirmPassword, {
   message: "Mật khẩu xác nhận không khớp",
@@ -47,21 +48,40 @@ export default function Settings() {
     },
   })
 
-  function onProfileSubmit(values: z.infer<typeof profileFormSchema>) {
+  async function onProfileSubmit(values: z.infer<typeof profileFormSchema>) {
     console.log(values)
     // TODO: Handle profile update
+    try {
+      await updateProfile({
+        email: values.email,
+        phoneNumber: values.phone,
+      });
+      toast.success("Cập nhật thông tin thành công!");
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Lỗi khi cập nhật thông tin!");
+    }
   }
 
-  function onSecuritySubmit(values: z.infer<typeof securityFormSchema>) {
+  async function onSecuritySubmit(values: z.infer<typeof securityFormSchema>) {
     console.log(values)
     // TODO: Handle password change
+    try {
+      await changePassword({
+        currentPassword: values.currentPassword,
+        newPassword: values.newPassword,
+      });
+      toast.success("Đổi mật khẩu thành công!");
+      securityForm.reset();
+    } catch (error) {
+      toast.error(error instanceof Error ? error.message : "Lỗi khi đổi mật khẩu!");
+    }
   }
 
   return (
     <div className="container px-4 py-8">
       <div className="space-y-8">
         <section>
-          <h2 className="text-2xl font-semibold mb-4">Cài Đặt Tài Khoản</h2>
+          <h2 className="text-2xl font-semibold mb-4">Cập nhật thông tin</h2>
           <Form {...profileForm}>
             <form onSubmit={profileForm.handleSubmit(onProfileSubmit)} className="space-y-4">
               <FormField
@@ -91,14 +111,14 @@ export default function Settings() {
                 )}
               />
               <Button type="submit" className="bg-blue-600 hover:bg-blue-700">
-                Cập Nhật Hồ Sơ
+                Cập Nhật
               </Button>
             </form>
           </Form>
         </section>
         
         <section>
-          <h2 className="text-2xl font-semibold mb-4">Cài Đặt Bảo Mật</h2>
+          <h2 className="text-2xl font-semibold mb-4">Cài Đặt Tài Khoản</h2>
           <Form {...securityForm}>
             <form onSubmit={securityForm.handleSubmit(onSecuritySubmit)} className="space-y-4">
               <FormField
