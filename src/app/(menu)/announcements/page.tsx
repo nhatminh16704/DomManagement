@@ -22,6 +22,7 @@ export default function Announcements() {
   const [notifications, setnotification] = useState<notification[]>([]);
   const [selectedNotification, setSelectedNotification] = useState<notification | null>(null);
   const typeNotification= ['MAINTENANCE','SECURITY','RULES','URGENT']; 
+  const typeNotificationVN=['BẢO TRÌ','AN NINH','QUY TẮC','CẤP BÁCH'];
   const [selected, setSelected] = useState<String>("");
   const [selectKey, setSelectKey] = useState(0);
   const userId = authService.getUserId();
@@ -87,7 +88,8 @@ export default function Announcements() {
   }
   
   const selecttypenotification = (type: string) => {
-    const filteredData = allNotifications.filter(item => item.type === type);
+    const typeEN = typeNotification[typeNotificationVN.indexOf(type)]
+    const filteredData = allNotifications.filter(item => item.type === typeEN);
     setnotification(filteredData);
   }
 
@@ -115,7 +117,7 @@ export default function Announcements() {
           <Select
             key={selectKey}
             className="w-64"
-            options={typeNotification.map((item) => ({ value: item, label: item }))}
+            options={typeNotificationVN.map((item) => ({ value: item, label: item }))}
             placeholder="Chọn loại thông báo"
             onChange={(selectedOption) => {
               if (selectedOption) {
@@ -189,13 +191,23 @@ export default function Announcements() {
             <Select
               id="type"
               className="w-full"
-              options={typeNotification.map((item) => ({ value: item, label: item }))}
+              options={typeNotificationVN.map((item) => ({ value: item, label: item }))}
               placeholder="Chọn loại thông báo"
               isClearable
-              value={formData.type ? { value: formData.type, label: formData.type } : null}
-              onChange={(selectedOption) =>
-                setFormData({ ...formData, type: selectedOption ? selectedOption.value : "" })
+              value={
+                formData.type
+                  ? {
+                      value: typeNotificationVN[typeNotification.indexOf(formData.type)],
+                      label: typeNotificationVN[typeNotification.indexOf(formData.type)],
+                    }
+                  : null
               }
+              onChange={(selectedOption) => {
+                const value = selectedOption?.value ?? "";
+                const index = typeNotificationVN.indexOf(value);
+                const selectedType = index !== -1 ? typeNotification[index] : "";
+                setFormData({ ...formData, type: selectedType });
+              }}
             />
           </div>
     

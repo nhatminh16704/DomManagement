@@ -71,8 +71,7 @@ export const payment= async(paymentrequest: PaymentRequest): Promise<string> =>{
     });
     if (!response.ok) {
       const errorMessage = await response.text(); 
-      return errorMessage;
-      
+      return errorMessage; 
     }
     return await response.text();
   } catch (error) {

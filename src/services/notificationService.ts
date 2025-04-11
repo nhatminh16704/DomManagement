@@ -78,7 +78,8 @@ export const addnotification = async(notification: createNotification): Promise<
         body: JSON.stringify(notification),
     })
     if (!response.ok) {
-        throw new Error("Lỗi khi thêm thông báo ");
+        const errorText = await response.text();
+        throw new Error(`Lỗi khi thêm thông báo: ${response.status} - ${errorText}`);
     }
     return response.text();
 }

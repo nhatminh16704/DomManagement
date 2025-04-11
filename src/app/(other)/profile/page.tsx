@@ -5,6 +5,8 @@ import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Badge } from "@/components/ui/badge";
 import { Calendar, Mail, MapPin, Phone, User } from "lucide-react"; // Biểu tượng từ lucide-react
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { use, useEffect, useState } from "react";
+import { getStudentById, Student } from "@/services/studentService";
 
 // Dữ liệu mock
 const mockProfile = {
