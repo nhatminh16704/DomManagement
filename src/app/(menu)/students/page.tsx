@@ -29,6 +29,7 @@ import AddStudentModal from "@/components/student/AddStudentModal";
 import AddViolationModal from "@/components/student/AddViolationModal";
 import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
 import { toast } from "react-toastify";
+import { formatDate } from "@/lib/utils";
 
 export default function Students() {
   const router = useRouter();
@@ -189,7 +190,7 @@ export default function Students() {
             <TableRow key={student.id}>
               <TableCell>{student.studentCode}</TableCell>
               <TableCell>{student.fullName}</TableCell>
-              <TableCell>{student.birthday}</TableCell>
+              <TableCell>{formatDate(student.birthday)}</TableCell>
               <TableCell>{student.gender}</TableCell>
               <TableCell>{student.className}</TableCell>
               <TableCell>{student.phoneNumber}</TableCell>

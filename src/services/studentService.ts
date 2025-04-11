@@ -20,7 +20,7 @@ export type RoomRental = {
   roomType: string;
   status: string;
   price: number;
-  endDate: string | null;
+  endDate: string;
 };
 
 export type Violation = {
@@ -65,7 +65,7 @@ export async function getStudents(): Promise<Student[]> {
   }
 }
 
-export async function getStudentById(studentCode: number): Promise<Student> {
+export async function getStudentById(studentCode: number): Promise<StudentProfile> {
   try {
     const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/${studentCode}`, {
