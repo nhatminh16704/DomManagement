@@ -1,3 +1,4 @@
+// src/app/students/page.tsx
 "use client";
 
 import { useEffect, useState } from "react";
@@ -23,8 +24,9 @@ import {
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 import { getStudents, deleteStudent, Student } from "@/services/studentService";
-import { Eye, Trash2, PenSquare } from "lucide-react";
+import { Eye, Trash2, PenSquare, AlertTriangle } from "lucide-react";
 import AddStudentModal from "@/components/student/AddStudentModal";
+import AddViolationModal from "@/components/student/AddViolationModal";
 import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
 import { toast } from "react-toastify";
 
@@ -34,8 +36,11 @@ export default function Students() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const studentsPerPage = 8;
-  const [isOpen, setIsOpen] = useState(false);
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false); // Modal thêm/sửa sinh viên
+  const [isConfirmOpen, setIsConfirmOpen] = useState(false); // Dialog xác nhận xóa
+  const [isViolationOpen, setIsViolationOpen] = useState(false); // Modal tạo vi phạm
+  const [selectedStudent, setSelectedStudent] = useState<Student | undefined>();
+  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
 
   // Fetch danh sách sinh viên
   useEffect(() => {
@@ -60,10 +65,7 @@ export default function Students() {
 
   const indexOfLastStudent = currentPage * studentsPerPage;
   const indexOfFirstStudent = indexOfLastStudent - studentsPerPage;
-  const currentStudents = filteredStudents.slice(
-    indexOfFirstStudent,
-    indexOfLastStudent
-  );
+  const currentStudents = filteredStudents.slice(indexOfFirstStudent, indexOfLastStudent);
   const totalPages = Math.ceil(filteredStudents.length / studentsPerPage);
 
   useEffect(() => setCurrentPage(1), [searchTerm]);
@@ -84,8 +86,6 @@ export default function Students() {
       .then((data) => setStudents(data))
       .catch((err) => console.error("Lỗi khi lấy danh sách sinh viên:", err));
   };
-
-  const [selectedStudent, setSelectedStudent] = useState<Student | undefined>();
 
   const handleAddStudent = () => {
     setIsOpen(true);
@@ -110,13 +110,14 @@ export default function Students() {
     setIsConfirmOpen(false);
   };
 
-  const [selectedStudentId, setSelectedStudentId] = useState<number | null>(
-    null
-  );
   const openConfirmModal = (studentId: number) => {
     setSelectedStudentId(studentId);
     setIsConfirmOpen(true);
+  };
 
+  const openViolationModal = (studentId: number) => {
+    setSelectedStudentId(studentId);
+    setIsViolationOpen(true);
   };
 
   return (
@@ -138,6 +139,12 @@ export default function Students() {
             onClose={() => setIsOpen(false)}
             onStudentAdded={refreshStudents}
             student={selectedStudent}
+          />
+          <AddViolationModal
+            isOpen={isViolationOpen}
+            onClose={() => setIsViolationOpen(false)}
+            studentId={selectedStudentId!}
+            onViolationAdded={refreshStudents}
           />
           <ConfirmDialog
             isOpen={isConfirmOpen}
@@ -207,6 +214,14 @@ export default function Students() {
                   </Button>
                   <Button
                     size="icon"
+                    className="h-10 w-10 bg-lightwarning text-warning hover:bg-warning hover:text-white transition-colors"
+                    onClick={() => openViolationModal(student.id)}
+                    title="Thêm vi phạm"
+                  >
+                    <AlertTriangle className="h-6 w-6" />
+                  </Button>
+                  <Button
+                    size="icon"
                     className="h-10 w-10 bg-lighterror text-error hover:bg-error hover:text-white transition-colors"
                     onClick={() => openConfirmModal(student.id)}
                     title="Xóa sinh viên"
@@ -226,9 +241,7 @@ export default function Students() {
               <PaginationPrevious
                 onClick={prevPage}
                 className={`hover:bg-blue-500 hover:text-white transition-colors ${
-                  currentPage === 1
-                    ? "pointer-events-none opacity-50"
-                    : "cursor-pointer"
+                  currentPage === 1 ? "pointer-events-none opacity-50" : "cursor-pointer"
                 }`}
               />
             </PaginationItem>
@@ -252,9 +265,7 @@ export default function Students() {
               <PaginationNext
                 onClick={nextPage}
                 className={`hover:bg-blue-500 hover:text-white transition-colors ${
-                  currentPage === totalPages
-                    ? "pointer-events-none opacity-50"
-                    : "cursor-pointer"
+                  currentPage === totalPages ? "pointer-events-none opacity-50" : "cursor-pointer"
                 }`}
               />
             </PaginationItem>
