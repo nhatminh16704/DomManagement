@@ -9,6 +9,12 @@ export type RoomBill = {
   status: "PAID" | "UNPAID" | "PENDING";
 };
 
+export type requestBill = {
+  amount : number,
+  bankCode : string,
+  idRef : number
+}
+
 // You might also want to define an enum for the status values
 export enum BillStatus {
   PAID = "PAID",
@@ -121,3 +127,28 @@ export const getStudentBills = async (): Promise<RoomBill[]> => {
     throw error;
   }
 };
+
+
+
+export async function payBill(billRequest: requestBill) {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(process.env.NEXT_PUBLIC_API_URL +'/vnpay/createBillPayment', {
+      method: "POST",
+      headers: { 
+          "Authorization": `Bearer ${token}`,
+          "Content-Type": "application/json" 
+      },
+      body: JSON.stringify(billRequest),
+  });
+  if (!response.ok) {
+    const errorMessage = await response.text(); 
+    return errorMessage; 
+  }
+  return await response.text();
+  } catch (error) {
+    console.error(error);
+    throw error;
+  }
+      
+}
