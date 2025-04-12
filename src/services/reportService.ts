@@ -70,3 +70,38 @@ export async function deleteReport(id: number): Promise<string> {
     throw error;
   }
 }
+
+export async function createReport({
+  studentId,
+  month,
+  content,
+}: {
+  studentId: number;
+  month: string;
+  content: string;
+}): Promise<string> {
+  try {
+    const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
+    const response = await fetch(`${API_URL}/create`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${token || ""}`,
+      },
+      body: JSON.stringify({
+        studentId,
+        month,
+        content,
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`Lỗi khi tạo báo cáo: ${response.status}`);
+    }
+
+    return await response.text(); // giả sử backend trả về chuỗi thông báo thành công
+  } catch (error) {
+    console.error("Error creating report:", error);
+    throw error;
+  }
+}

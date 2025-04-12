@@ -20,7 +20,7 @@ export type RoomRental = {
   roomType: string;
   status: string;
   price: number;
-  endDate: string | null;
+  endDate: string;
 };
 
 export type Violation = {
@@ -65,10 +65,28 @@ export async function getStudents(): Promise<Student[]> {
   }
 }
 
-export async function getStudentById(studentCode: number): Promise<Student> {
+export async function getStudentById(studentCode: number): Promise<StudentProfile> {
   try {
     const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}/${studentCode}`, {
+      headers: {
+        'Authorization': `Bearer ${token}`
+      }
+    });
+    if (!response.ok) {
+      const errorMessage = await response.text();
+      throw new Error(errorMessage);
+    }
+    return await response.json();
+  } catch (error) {
+    console.error("Error fetching student:", error);
+    throw error;
+  }
+}
+export async function getStudentByAccountIdFromStudent(): Promise<Student> {
+  try {
+    const token = localStorage.getItem('token');
+    const response = await fetch(`${API_URL}/info`, {
       headers: {
         'Authorization': `Bearer ${token}`
       }

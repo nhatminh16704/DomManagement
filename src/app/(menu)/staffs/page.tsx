@@ -27,6 +27,7 @@ import { Eye, Trash2, PenSquare } from "lucide-react";
 import AddStaffModal from "@/components/staff/AddStaffModal";
 import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
 import { toast } from "react-toastify";
+import { formatDate } from "@/lib/utils";
 
 console.log("tesst");
 
@@ -173,7 +174,7 @@ export default function Staffs() {
           {currentStaffs.map((staff) => (
             <TableRow key={staff.id}>
               <TableCell>{`${staff.lastName} ${staff.firstName}`}</TableCell>
-              <TableCell>{staff.birthday}</TableCell>
+              <TableCell>{formatDate(staff.birthday)}</TableCell>
               <TableCell>{staff.gender}</TableCell>
               <TableCell>{staff.position}</TableCell>
               <TableCell>{staff.startDate}</TableCell>

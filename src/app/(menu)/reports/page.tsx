@@ -139,18 +139,24 @@ export default function Reports() {
     setIsAddOpen(true);
   };
 
+  function formatSentDate(rawDate: string): string {
+    const date = new Date(rawDate);
+    return new Intl.DateTimeFormat("vi-VN", {
+      day: "2-digit",
+      month: "2-digit",
+      year: "numeric",
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    }).format(date);
+  }
+
   return (
     <div className="container mx-auto p-4">
-      <div className="flex justify-between items-center mb-5">
-        <h1 className="text-3xl font-bold mb-8 text-center text-primary relative pb-3 after:content-[''] after:absolute after:w-24 after:h-1 after:bg-primary after:bottom-0 after:left-1/2 after:-translate-x-1/2">
+      <div className="text-center mb-8">
+        <h1 className="text-4xl font-bold text-center text-primary relative pb-3 after:content-[''] after:absolute after:w-24 after:h-1 after:bg-primary after:bottom-0 after:left-1/2 after:-translate-x-1/2">
           Reports Management
         </h1>
-        <Button
-          className="bg-colorprimary hover:bg-colorprimary/90 text-white"
-          onClick={handleAddReport}
-        >
-          Tạo báo cáo
-        </Button>
       </div>
 
       {/* Stat cards */}
@@ -193,28 +199,39 @@ export default function Reports() {
         </div>
       </div>
 
-      {/* Search box */}
-      <div className="flex justify-between mb-4">
-        <div className="w-1/3">
-          <input
-            type="text"
-            placeholder="Search"
-            className="w-full p-2 border rounded"
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-          />
-        </div>
-        {filteredStatus && (
-          <div className="flex items-center">
-            <span className="mr-2">Filtered by: {filteredStatus}</span>
-            <button
-              className="text-sm text-gray-500 hover:text-red-500"
-              onClick={() => setFilteredStatus(null)}
-            >
-              Clear filter
-            </button>
+      {/* Search box và Filter info */}
+      <div className="flex justify-between items-center mb-4">
+        <div className="flex items-center gap-4">
+          <div className="w-[300px]">
+            <input
+              type="text"
+              placeholder="Search"
+              className="w-full p-2 border rounded"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
           </div>
-        )}
+          {filteredStatus && (
+            <div className="flex items-center">
+              <span className="text-sm text-gray-600">
+                Filtered by:{" "}
+                <span className="font-bold uppercase">{filteredStatus}</span>
+              </span>
+              {/* <button
+                className="ml-2 text-sm text-gray-500 hover:text-red-500"
+                onClick={() => setFilteredStatus(null)}
+              >
+                Clear filter
+              </button> */}
+            </div>
+          )}
+        </div>
+        <Button
+          className="bg-colorprimary hover:bg-colorprimary/90 text-white"
+          onClick={handleAddReport}
+        >
+          Tạo báo cáo
+        </Button>
       </div>
 
       {/* Table */}
@@ -249,15 +266,7 @@ export default function Reports() {
                   {report.status}
                 </span>
               </TableCell>
-                <TableCell>
-                {new Date(report.sentDate).toLocaleString('vi-VN', {
-                  year: 'numeric',
-                  month: 'short',
-                  day: 'numeric',
-                  hour: '2-digit',
-                  minute: '2-digit'
-                })}
-                </TableCell>
+              <TableCell>{formatSentDate(report.sentDate)}</TableCell>
               <TableCell>
                 <div className="flex gap-3">
                   <Button
@@ -332,63 +341,170 @@ export default function Reports() {
 
       {/* Modal chỉnh sửa report */}
       {selectedReport && (
-        <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
-          <DialogContent className="sm:max-w-[600px]">
-            <DialogHeader>
-              <DialogTitle>Chi tiết báo cáo</DialogTitle>
-            </DialogHeader>
-            <div className="grid gap-4 py-4">
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="id" className="text-right">
-                  ID
-                </Label>
-                <div className="col-span-3 text-gray-700">{selectedReport.id}</div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="title" className="text-right">
-                  Tiêu đề
-                </Label>
-                <div className="col-span-3 text-gray-700">{selectedReport.title}</div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="content" className="text-right">
-                  Nội dung
-                </Label>
-                <div className="col-span-3 text-gray-700">{selectedReport.content}</div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="sentFrom" className="text-right">
-                  Gửi từ
-                </Label>
-                <div className="col-span-3 text-gray-700">{selectedReport.createdBy.userName}</div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="sentDate" className="text-right">
-                  Ngày gửi
-                </Label>
-                <div className="col-span-3 text-gray-700">{selectedReport.sentDate}</div>
-              </div>
-              <div className="grid grid-cols-4 items-center gap-4">
-                <Label htmlFor="status" className="text-right">
-                  Trạng thái
-                </Label>
-                <Select
-                  value={selectedReport.status}
-                  onValueChange={(value) => handleUpdateStatus(value)}
-                >
-                  <SelectTrigger className="col-span-3">
+  <Dialog open={isEditOpen} onOpenChange={setIsEditOpen}>
+    <DialogContent className="sm:max-w-[650px] rounded-xl shadow-2xl bg-white p-0 overflow-hidden">
+      {/* Header */}
+      <div className="relative bg-gray-900 text-white p-5 flex justify-between items-center">
+        <DialogTitle className="text-xl font-bold tracking-tight">
+          Báo cáo #{selectedReport.id}
+        </DialogTitle>
+        <button
+          onClick={() => setIsEditOpen(false)}
+          className="text-gray-300 hover:text-white transition-colors"
+        >
+          <svg
+            className="w-5 h-5"
+            fill="none"
+            stroke="currentColor"
+            viewBox="0 0 24 24"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth="2"
+              d="M6 18L18 6M6 6l12 12"
+            />
+          </svg>
+        </button>
+      </div>
+
+      {/* Body */}
+      <div className="p-6 space-y-6 bg-gray-50">
+        {/* Thông tin chính */}
+        <div className="space-y-4">
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-blue-100 text-blue-600">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                />
+              </svg>
+            </span>
+            <div className="flex-1">
+              <p className="text-sm text-gray-500">Tiêu đề</p>
+              <p className="text-gray-900 font-medium">{selectedReport.title}</p>
+            </div>
+          </div>
+
+          <div className="flex items-start gap-3">
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-green-100 text-green-600">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"
+                />
+              </svg>
+            </span>
+            <div className="flex-1">
+              <p className="text-sm text-gray-500">Nội dung</p>
+              <p className="text-gray-900 font-medium leading-relaxed">{selectedReport.content}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-purple-100 text-purple-600">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"
+                />
+              </svg>
+            </span>
+            <div className="flex-1">
+              <p className="text-sm text-gray-500">Gửi từ</p>
+              <p className="text-gray-900 font-medium">{selectedReport.createdBy.userName}</p>
+            </div>
+          </div>
+
+          <div className="flex items-center gap-3">
+            <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-yellow-100 text-yellow-600">
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+                xmlns="http://www.w3.org/2000/svg"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"
+                />
+              </svg>
+            </span>
+            <div className="flex-1">
+              <p className="text-sm text-gray-500">Ngày gửi</p>
+              <p className="text-gray-900 font-medium">{formatSentDate(selectedReport.sentDate)}</p>
+            </div>
+          </div>
+        </div>
+
+        {/* Trạng thái */}
+        <div className="flex items-center gap-3">
+          <span className="inline-flex items-center justify-center w-10 h-10 rounded-full bg-red-100 text-red-600">
+            <svg
+              className="w-5 h-5"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+              xmlns="http://www.w3.org/2000/svg"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth="2"
+                d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
+              />
+            </svg>
+          </span>
+          <div className="flex-1">
+            <p className="text-sm text-gray-500">Trạng thái</p>
+            <Select
+              value={selectedReport.status}
+              onValueChange={(value) => handleUpdateStatus(value)}
+            >
+              <SelectTrigger className="col-span-3">
                     <SelectValue placeholder="Chọn trạng thái" />
                   </SelectTrigger>
                   <SelectContent>
+                    <SelectItem value="PENDING">Pending</SelectItem>
                     <SelectItem value="INPROGRESS">In Progress</SelectItem>
                     <SelectItem value="RESOLVED">Resolved</SelectItem>
                   </SelectContent>
-                </Select>
-              </div>
-            </div>
-          </DialogContent>
-        </Dialog>
-      )}
+            </Select>
+          </div>
+        </div>
+      </div>
+    </DialogContent>
+  </Dialog>
+)}
     </div>
   );
 }
