@@ -17,6 +17,16 @@
 //import { toast } from "react-toastify";
 
 'use client';
+import {
+  Table,
+  TableBody,
+  TableCaption,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { useRouter, useSearchParams } from 'next/navigation';
 
 import React, { useEffect, useState } from 'react';
 import { getStudentBills, payBill, RoomBill } from '@/services/billService';
@@ -42,19 +52,19 @@ export default function StudentBillTable() {
   };
 
 
-    const fetchBillsByStatusAndMonth = async () => {
-      try {
-        // Format selectedMonth as YYYY-MM-01 to include the first day of the month
-        const formattedMonth = `${selectedMonth}-01`;
-        const data = await getBillsByMonthAndStatus(
-          formattedMonth,
-          selectedStatus
-        );
-        setBills(data);
-      } catch (error) {
-        console.error("Error fetching bills:", error);
-      }
-    };
+  const fetchBillsByStatusAndMonth = async () => {
+    try {
+      // Format selectedMonth as YYYY-MM-01 to include the first day of the month
+      const formattedMonth = `${selectedMonth}-01`;
+      const data = await getBillsByMonthAndStatus(
+        formattedMonth,
+        selectedStatus
+      );
+      setBills(data);
+    } catch (error) {
+      console.error("Error fetching bills:", error);
+    }
+  };
 
   const handlePay = async (bill: number) => {
     try {
@@ -79,75 +89,66 @@ export default function StudentBillTable() {
     }
   };
 
+  const router = useRouter();
+  const searchParams = useSearchParams();
   useEffect(() => {
+    const paymentStatus = searchParams.get("payment");
+
+    if (paymentStatus === "success") {
+      toast.success("Thanh toán thành công!");
+      router.replace("bills");
+    } else if (paymentStatus === "fail") {
+      toast.error("Thanh toán thất bại!");
+      router.replace("bills"); 
+    }
     fetchBills();
   }, []);
 
   return (
-    
-    <div className="p-6 bg-white rounded-xl shadow-md">
-      <h1 className="text-2xl font-bold mb-4">Bills</h1>
-      <div className="flex mb-4 gap-2">
-        <select
-          className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={selectedStatus}
-          onChange={(e) => {
-            setSelectedStatus(e.target.value);
-          }}
-        >
-          <option value="PENDING">Pending</option>
-          <option value="PAID">Paid</option>
-          <option value="UNPAID">Unpaid</option>
-        </select>
 
-        <input
-          type="month"
-          className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-          value={selectedMonth}
-          onChange={(e) => setSelectedMonth(e.target.value)}
-        />
-
-        <button
-          className="px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500"
-          onClick={() => {
-            fetchBillsByStatusAndMonth();
-          }}
-        >
-          Apply
-        </button>
-      </div>
+    <div className="overflow-x-auto">
       <h2 className="text-2xl font-bold mb-4">Hóa đơn của bạn</h2>
-      <table className="w-full border border-gray-200 text-sm">
-        <thead className="bg-gray-100 text-left">
-          <tr>
-            <th className="px-4 py-2 border">Tháng</th>
-            <th className="px-4 py-2 border">Điện đầu</th>
-            <th className="px-4 py-2 border">Điện cuối</th>
-            <th className="px-4 py-2 border">Số tiền</th>
-            <th className="px-4 py-2 border">Trạng thái</th>
-            <th className="px-4 py-2 border">Hành động</th>
-          </tr>
-        </thead>
-        <tbody>
+      <Table>
+        <TableCaption>List of all bills</TableCaption>
+        <TableHeader>
+          <TableRow>
+            <TableHead>Room</TableHead>
+            <TableHead>Bill Month</TableHead>
+            <TableHead>Electricity Start</TableHead>
+            <TableHead>Electricity End</TableHead>
+            <TableHead>Total Amount</TableHead>
+            <TableHead>Status</TableHead>
+            <TableHead>Hành động</TableHead>
+          </TableRow>
+        </TableHeader>
+        <TableBody>
           {bills.map((bill) => (
-            <tr key={bill.id} className="hover:bg-gray-50">
-              <td className="px-4 py-2 border">
-                {new Date(bill.billMonth).toLocaleDateString("vi-VN", {
-                  month: "2-digit",
-                  year: "numeric",
-                })}
-              </td>
-              <td className="px-4 py-2 border">{bill.electricityStart}</td>
-              <td className="px-4 py-2 border">{bill.electricityEnd ?? 'Chưa có'}</td>
-              <td className="px-4 py-2 border">
+            <TableRow key={bill.id}>
+              <TableCell>{bill.roomName}</TableCell>
+              <TableCell>
+                {bill.billMonth
+                  ? new Date(bill.billMonth).toLocaleDateString(undefined, {
+                    month: "2-digit",
+                    year: "numeric",
+                  })
+                  : "N/A"}
+              </TableCell>
+              <TableCell>{bill.electricityStart}</TableCell>
+              <TableCell>{bill.electricityEnd}</TableCell>
+              <TableCell>
                 {bill.totalAmount
                   ? bill.totalAmount.toLocaleString("vi-VN", {
                     style: "currency",
                     currency: "VND",
                   })
-                  : "N/A"}
-              </td>
-              <td className="px-4 py-2 border">
+                  : endReadings[bill.id] && Number(endReadings[bill.id]) > bill.electricityStart
+                    ? ((Number(endReadings[bill.id]) - bill.electricityStart) * 3000).toLocaleString("vi-VN", {
+                      style: "currency",
+                      currency: "VND",
+                    })
+                    : "N/A"}
+              </TableCell>
+              <TableCell>
                 <Badge
                   className={
                     bill.status === "PAID"
@@ -159,8 +160,8 @@ export default function StudentBillTable() {
                 >
                   {bill.status}
                 </Badge>
-              </td>
-              <td className="px-4 py-2 border">
+              </TableCell>
+              <TableCell>
                 {(bill.status === "PENDING" || bill.status === "UNPAID") && (
                   <button
                     onClick={() => handlePay(bill.id)}
@@ -170,14 +171,15 @@ export default function StudentBillTable() {
                   </button>
                 )}
                 {bill.status === "PAID" && <span className="text-gray-400 text-xs"></span>}
-              </td>
-            </tr>
+              </TableCell>
+            </TableRow>
           ))}
-        </tbody>
-      </table>
+        </TableBody>
+      </Table>
     </div>
   );
 }
+
 
 
 

@@ -1,8 +1,24 @@
 import Link from "next/link";
 import Image from "next/image";
 import { ChatBubbleLeftIcon, MegaphoneIcon } from "@heroicons/react/24/outline";
+import { useEffect, useState } from "react";
+
 
 const Header = () => {
+  const [user, setUser] = useState({ name: "", role: "" });
+  useEffect(() => {
+    const fetchUser = async () => {
+      try {
+        const res = await fetch("/api/user"); 
+        const data = await res.json();
+        setUser({ name: data.name, role: data.role }); 
+      } catch (error) {
+        console.error("Lỗi khi lấy thông tin người dùng:", error);
+      }
+    };
+
+    fetchUser();
+  }, []);
   return (
     <div className="flex shadow-md bg-[#F7F8FA]">
       <div className="w-[14%] md:w-[8%] lg:w-[16%] xl:w-[14%] p-4">
