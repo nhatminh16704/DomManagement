@@ -1,4 +1,3 @@
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/auth";
 
 // Định nghĩa kiểu dữ liệu cho payload của JWT (tùy chỉnh theo back-end)
@@ -40,7 +39,8 @@ class AuthService {
       localStorage.setItem(this.tokenKey, jwtToken); // Lưu token
       return jwtToken;
     } catch (error: unknown) {
-      const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
+      const errorMessage =
+        error instanceof Error ? error.message : "Unknown error occurred";
       throw new Error(`Lỗi đăng nhập: ${errorMessage}`);
     }
   }
@@ -84,12 +84,6 @@ class AuthService {
     return payload?.role || null;
   }
 
-  // Lấy id người dùng từ token
-  getUserId(): number | null {
-    const payload = this.getPayload();
-    return payload?.id || null;
-  }
-
   // Kiểm tra token có hết hạn không
   isTokenExpired(token?: string): boolean {
     const payload = this.getPayload(token);
@@ -101,6 +95,11 @@ class AuthService {
   getUsername(): string | null {
     const payload = this.getPayload();
     return payload?.sub || null;
+  }
+
+  getUserId(): number | null {
+    const payload = this.getPayload();
+    return payload?.id || null;
   }
 }
 

@@ -15,6 +15,7 @@ import {
   ArrowRightStartOnRectangleIcon,
   UsersIcon,
   UserGroupIcon,
+  BanknotesIcon
 } from "@heroicons/react/24/outline";
 import authService from "@/services/authService";
 
@@ -59,10 +60,17 @@ const menuItems = [
         visible: ["ADMIN", "STAFF", "STUDENT"],
       },
       {
-        icon: <CalendarIcon className="w-6 h-6" />,
+        icon: <BanknotesIcon className="w-6 h-6" />,
         label: "Billing",
         name: "Hóa đơn",
         href: "/bills",
+        visible: ["ADMIN", "STUDENT"],
+      },
+      {
+        icon: <CalendarIcon className="w-6 h-6" />,
+        label: "Events",
+        name: "Sự kiện",
+        href: "/events",
         visible: ["ADMIN", "STUDENT"],
       },
       {
@@ -109,14 +117,15 @@ const menuItems = [
   },
 ];
 
-const Menu = () => {
+
+const Menu = ({ numberMessage }: { numberMessage: number }) => {
   const pathname = usePathname();
   const context = useContext(UnreadMessagesContext);
   const unreadCount = context?.unreadCount || 0;
   const role = authService.getRole();
 
   return (
-    <div className="p-5">
+    <div className="p-5 relative">
       {menuItems.map((i) => (
         <div className="flex flex-col gap-2" key={i.title}>
           <span className="hidden lg:block text-gray-400 font-light my-4">

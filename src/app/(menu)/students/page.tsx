@@ -121,7 +121,7 @@ export default function Students() {
   };
 
   return (
-    <div>
+    <div className="bg-[#F7F8FA]">
       <div className="flex justify-between items-center mb-5">
         <h1 className="text-2xl font-semibold text-gray-800 mb-5">
           Danh sách sinh viên

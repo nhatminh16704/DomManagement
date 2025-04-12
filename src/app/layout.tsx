@@ -5,7 +5,7 @@ import { Inter } from "next/font/google";
 import "./globals.css";
 import Menu from "@/components/layouts/Menu";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import authService from "@/services/authService";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -23,6 +23,13 @@ export default function RootLayout({
   const router = useRouter();
   const isLoginPage = pathname === "/login";
   const isNotFoundPage = pathname === "/not-found";
+  const [numberMessage, setnumberMessage] = useState(0);
+
+  const updateUnreadMessages = () => {
+    const unread = localStorage.getItem("numberMessage");
+    console.log(unread)
+    setnumberMessage(unread ? parseInt(unread) : 0);
+  };
 
   useEffect(() => {
     const authUser = authService.isAuthenticated();
@@ -30,6 +37,27 @@ export default function RootLayout({
       router.push("/login"); // Nếu chưa login và không ở trang login, redirect về login
     }
   }, [isLoginPage, isNotFoundPage, pathname, router]);
+
+  useEffect(() => {
+    // Cập nhật số tin nhắn khi component được load lần đầu
+    updateUnreadMessages();
+  
+    // Lắng nghe sự kiện thay đổi trong localStorage
+    const handleStorageChange = (event: StorageEvent) => { 
+      if (event.key === "numberMessage") {
+        updateUnreadMessages(); // Cập nhật lại số lượng tin nhắn
+      }
+    };
+  
+    window.addEventListener("storage", handleStorageChange); // Lắng nghe sự kiện 'storage'
+  
+    // Cleanup khi component bị hủy
+    return () => {
+      window.removeEventListener("storage", handleStorageChange);
+    };
+  }, []);
+
+
 
   if (isLoginPage || isNotFoundPage) {
     return (

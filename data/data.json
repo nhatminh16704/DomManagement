@@ -1,7 +1,7 @@
 {
   "students": [
     {
-      "id": 1,
+      "id": "1",
       "student_code": "N22DCCN001",
       "first_name": "Nguyễn Văn",
       "name": "A",
@@ -13,7 +13,7 @@
       "hometown": "Hà Nội"
     },
     {
-      "id": 2,
+      "id": "2",
       "student_code": "N21QTKD002",
       "first_name": "Trần Thị",
       "name": "B",
@@ -25,7 +25,7 @@
       "hometown": "TP. Hồ Chí Minh"
     },
     {
-      "id": 3,
+      "id": "3",
       "student_code": "N23KT003",
       "first_name": "Lê Minh",
       "name": "C",
@@ -37,7 +37,7 @@
       "hometown": "Đà Nẵng"
     },
     {
-      "id": 4,
+      "id": "4",
       "student_code": "N20ATTT004",
       "first_name": "Phạm Thảo",
       "name": "D",
@@ -49,7 +49,7 @@
       "hometown": "Cần Thơ"
     },
     {
-      "id": 5,
+      "id": "5",
       "student_code": "N22CNTT005",
       "first_name": "Hoàng Anh",
       "name": "E",
@@ -63,19 +63,19 @@
   ],
   "accounts": [
     {
-      "id": 1,
+      "id": "1",
       "username": "admin",
       "password": "admin123",
       "role": "admin"
     },
     {
-      "id": 2,
+      "id": "2",
       "username": "N22DCCN001",
       "password": "123456",
       "role": "student"
     },
     {
-      "id": 3,
+      "id": "3",
       "username": "N21QTKD002",
       "password": "654321",
       "role": "student"
@@ -160,28 +160,108 @@
   ],
   "notification": [
     {
-      "id": 1,
+      "id": "1",
       "title": "Thông báo V/v: Thu học phí Học kỳ 2 năm học 2024-2025 đối với sinh viên hệ Đại học chính quy",
       "content": "Nội dung thông báo 1",
       "created_date": "2024-02-27T08:00:00.000Z",
-      "type": 2
+      "account_id": 2,
+      "type": "Thông báo 3"
     },
     {
-      "id": 2,
+      "id": "2",
       "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
       "content": "Nội dung thông báo 2",
       "created_date": "2024-02-27T09:00:00.000Z",
-      "type": 1
-    }
-  ],
-  "typenotification": [
-    { "id": 1,
-     "name": "Thông báo hệ thống"
+      "account_id": 2,
+      "type": "Thông báo 2"
     },
-    { "id": 2,
-     "name": "Thông báo cập nhật" 
+    {
+      "id": "3",
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "account_id": 2,
+      "type": "Thông báo 2"
+    },
+    {
+      "id": "4",
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "account_id": 2,
+      "type": "Thông báo 3"
+    },
+    {
+      "id": "5",
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "account_id": 2,
+      "type": "Thông báo 2"
+    },
+    {
+      "id": "6",
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "account_id": 2,
+      "type": "Thông báo 2"
+    },
+    {
+      "id": "7",
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "account_id": 2,
+      "type": "Thông báo 3"
+    },
+    {
+      "id": "8",
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "account_id": 2,
+      "type": "Thông báo 1"
+    },
+    {
+      "id": "9",
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "account_id": 3,
+      "type": "Thông báo 1"
+    },
+    {
+      "id": "10",
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "account_id": 4,
+      "type": "Thông báo 1"
+    },
+    {
+      "id": "11",
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "account_id": 2,
+      "type": "Thông báo 1"
+    },
+    {
+      "id": "12",
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "account_id": 1,
+      "type": "Thông báo 1"
+    },
+    {
+      "id": "13",
+      "title": "Về việc đăng ký mua tài khoản ED, tài khoản OLPC cho HK2 năm học 2024-2025",
+      "content": "Nội dung thông báo 2",
+      "created_date": "2024-02-27T09:00:00.000Z",
+      "account_id": 2,
+      "type": "Thông báo 1"
     }
   ]
-  
-  
 }

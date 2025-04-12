@@ -12,10 +12,44 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { RoomDetail, getRoomDetail } from "@/services/roomService";
+import authService from "@/services/authService";
+import { payment, registrationRoom } from "@/services/roomrentalService";
+import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+  DialogFooter,
+} from "@/components/ui/dialog";
+import { getStudentById, Student } from "@/services/studentService";
+
+export type roomRentalRequest ={
+  roomId: number;
+  price: number;
+  accountId: number;
+}
+export type PaymentRequest ={
+  amount: number;
+  bankCode: String;
+  idRef: number;
+}
 
 export default function RoomDetailPage() {
   const { id } = useParams();
   const [roomDetail, setRoomDetail] = useState<RoomDetail | null>(null);
+  const [student,setstudent] = useState<Student|null>(null);
+  const [paymentStatus, setPaymentStatus] = useState<boolean | null>(null);
+  const [regist,setRegist] = useState<boolean>(false);
+  
+  const role = authService.getRole();
+  const [isVisible, setIsVisible] = useState<boolean>(false);
+  const userId = authService.getUserId();
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+
+  const params = new URLSearchParams(location.search);
+  const status = params.get("status");
 
   useEffect(() => {
     const fetchRoomDetail = async () => {
@@ -30,20 +64,105 @@ export default function RoomDetailPage() {
     if (id) {
       fetchRoomDetail();
     }
-  }, [id]);
+    if (status != null) {
+      const newStatus = status === "success" ? true : false;
+      setPaymentStatus(newStatus);
+      setErrorMessage(newStatus? "Thanh toán thành công":"Thanh toán thất bại");
+    }
+  }, [id, status]);
+  useEffect(() => {
+      setIsVisible(true);
+      setTimeout(() => {
+        setIsVisible(false);
+        setPaymentStatus(null);
+      }, 2000);
+  },[paymentStatus]);
+  useEffect(()=>{
+    const fetchStudent = async () => {
+      if (userId) {
+        try {
+          const studentDetail = await getStudentById(userId);
+          setstudent(studentDetail);
+        } catch (error) {
+          console.error("Error fetching student data:", error);
+        }
+      }
+    };
+    
+    fetchStudent();
+  }, [userId]);
 
   if (!roomDetail) {
     return <div className="p-8">Không tìm thấy phòng</div>;
   }
 
+
+
   const { students, devices, room } = roomDetail;
   
+  const detailregistrationRoom= async()=>{
+        setRegist(true);
+  }
+ 
+  const handleregistrationRoom= async ()=>{
+    if (userId !== null) {
+      const request: roomRentalRequest = {
+        roomId: room.id,
+        price: room.price,
+        accountId: userId
+      };
+      console.log(request);
+  
+      try {
+        const registId = await registrationRoom(request); 
+        if(registId!=null){
+          if(!isNaN(Number(registId))){
+            const paymentRequest: PaymentRequest={
+            amount: room.price*6,
+            bankCode: "NCB",
+            idRef: Number(registId),
+            }
+            const path = await payment(paymentRequest);
+            if (path.startsWith("http")) {
+              window.location.href = path;
+              setErrorMessage(null);
+            }else{
+              setRegist(false);
+              setIsVisible(true);
+              setPaymentStatus(false);
+              setErrorMessage(path);
+            }
+            
+          }else{
+            if(registId==="Ngoài thời gian đăng ký" || registId=== "You can't rent more rooms" || registId ==="Không thể đăng ký phòng khác giới"){
+              setRegist(false);
+              setIsVisible(true);
+              setPaymentStatus(false);
+              setErrorMessage(registId);
+            }
+          } 
+        }
+      } catch (error) {
+        console.error("Lỗi khi đăng ký phòng:", error);
+      }
+    }
+
+  }
   
 
   return (
     <div className="p-6">
-      <h1 className="text-3xl font-bold mb-6">Chi tiết phòng {room.roomName}</h1>
-
+        <div className="flex justify-between items-center p-4 border-b">
+          <div className="text-xl font-bold">Chi tiết phòng {room.roomName}</div>
+          
+          <div>
+            <button className={room.available > 0 && role === "STUDENT" && student?.gender ===room.blockType ?"px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600":"px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 hidden" } 
+           onClick={detailregistrationRoom}
+           >
+              Đăng ký
+            </button>
+          </div>
+        </div>
       {/* Room Information Card */}
       <Card className="mb-8">
         <CardHeader>
@@ -206,6 +325,91 @@ export default function RoomDetailPage() {
           </Tabs>
         </CardContent>
       </Card>
+
+      {isVisible && paymentStatus != null && (
+        <div className="fixed inset-0 flex justify-center items-center bg-gray-700 bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg shadow-lg max-w-md w-full text-center">
+            {paymentStatus == true ? (
+              <div className="flex justify-center items-center text-green-500">
+                <CheckCircleIcon className="h-8 w-8 mr-2" />
+                <span>{errorMessage}</span>
+              </div>
+            ) : (
+              <div className="flex justify-center items-center text-red-500">
+                <XCircleIcon className="h-8 w-8 mr-2" />
+                <span>{errorMessage}</span>
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+
+
+      {(<Dialog open={regist} onOpenChange={(open) => setRegist(open)}>
+        
+        <DialogContent className="sm:max-w-[600px]">
+          <div className="text-center">
+            <DialogHeader>
+              <DialogTitle>Thông tin đăng ký</DialogTitle>
+              <DialogDescription>
+                Đây là thông tin chi tiết của sinh viên
+              </DialogDescription>
+            </DialogHeader>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4 py-4 text-sm">
+            <div className="flex items-center">
+              <strong className="mr-2">Mã SV:</strong>
+              <p>{student?.studentCode}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Họ và tên:</strong>
+              <p>{student?.fullName}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Ngày sinh:</strong>
+              <p>{student?.birthday}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Giới tính:</strong>
+              <p>{student?.gender}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Mã phòng:</strong>
+              <p>{room.roomName}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Loại phòng:</strong>
+              <p>{room.typeRoom}</p>
+            </div>
+            <div className="flex items-center">
+              <strong className="mr-2">Giá:</strong>
+              <p>{room.price * 6}</p>
+            </div>
+          </div>
+
+          <DialogFooter>
+            <button
+              type="button"
+              onClick={() => setRegist(false)}
+               className="border-2 border-gray-500 bg-white text-gray-700 px-4 py-2 rounded-lg hover:bg-gray-100"
+            >
+              Đóng
+            </button>
+            <button 
+              type="button"
+              onClick={handleregistrationRoom}
+               className="border-2 border-blue-500 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
+            >
+              Thanh toán 
+            </button>
+          </DialogFooter>
+        </DialogContent>
+
+        </Dialog>
+      )}
+        
+
     </div>
   );
 }
