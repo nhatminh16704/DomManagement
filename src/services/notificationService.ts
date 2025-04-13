@@ -65,7 +65,7 @@ export const getnotificationtype = async(type:string): Promise<notification[]> =
 }
 
 
-export const addnotification = async(notification: createNotification): Promise< String > =>{
+export const addnotification = async(notification: createNotification): Promise< string > =>{
     if (!token) {
         throw new Error("Người dùng chưa đăng nhập.");
     }

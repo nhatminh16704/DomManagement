@@ -65,12 +65,6 @@ export default function StudentDetailPage() {
               </CardTitle>
               <p className="text-sm text-gray-500">Mã SV: {profile.studentCode}</p>
             </div>
-            <Badge
-              variant="outline"
-              className="bg-green-500 text-white text-base px-4 py-1 font-semibold"
-            >
-              Active
-            </Badge>
           </div>
         </CardHeader>
 
@@ -131,123 +125,123 @@ export default function StudentDetailPage() {
       <Card className="w-full max-w-7xl shadow-lg rounded-lg overflow-hidden">
         <CardHeader>
           <CardTitle className="text-2xl font-semibold text-gray-800">
-            Dormitory Information
+        Thông tin Ký túc xá
           </CardTitle>
         </CardHeader>
         <CardContent>
           <Tabs defaultValue="current" className="w-full">
-            <TabsList className="grid w-full grid-cols-3 mb-6 bg-gray-100 rounded-lg p-1">
-              <TabsTrigger
-                value="current"
-                className="py-2 text-gray-700 font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm rounded-md transition-all"
-              >
-                Current Room
-              </TabsTrigger>
-              <TabsTrigger
-                value="history"
-                className="py-2 text-gray-700 font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm rounded-md transition-all"
-              >
-                Room History
-              </TabsTrigger>
-              <TabsTrigger
-                value="violation"
-                className="py-2 text-gray-700 font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm rounded-md transition-all"
-              >
-                Violations
-              </TabsTrigger>
-            </TabsList>
+        <TabsList className="grid w-full grid-cols-3 mb-6 bg-gray-100 rounded-lg p-1">
+          <TabsTrigger
+            value="current"
+            className="py-2 text-gray-700 font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm rounded-md transition-all"
+          >
+            Phòng Hiện tại
+          </TabsTrigger>
+          <TabsTrigger
+            value="history"
+            className="py-2 text-gray-700 font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm rounded-md transition-all"
+          >
+            Lịch sử Phòng
+          </TabsTrigger>
+          <TabsTrigger
+            value="violation"
+            className="py-2 text-gray-700 font-medium data-[state=active]:bg-white data-[state=active]:text-blue-600 data-[state=active]:shadow-sm rounded-md transition-all"
+          >
+            Vi phạm
+          </TabsTrigger>
+        </TabsList>
 
-            <TabsContent value="current" className="mt-0">
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">
-                  Current Room Information
-                </h3>
-                {currentRoom ? (
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-600">Room Number</span>
-                      <span className="text-gray-800 font-semibold">{currentRoom.roomName}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-600">Check-in Date</span>
-                      <span className="text-gray-800 font-semibold">{formatDate(currentRoom.startDate)}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-600">Room Type</span>
-                      <span className="text-gray-800 font-semibold">{currentRoom.roomType}</span>
-                    </div>
-                    <div className="flex flex-col">
-                      <span className="text-sm font-medium text-gray-600">Price</span>
-                      <span className="text-gray-800 font-semibold">
-                        {currentRoom.price.toLocaleString()} VND
-                      </span>
-                    </div>
-                  </div>
-                ) : (
-                  <p className="text-gray-500 italic">Không có phòng hiện tại.</p>
-                )}
-              </div>
-            </TabsContent>
+        <TabsContent value="current" className="mt-0">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">
+          Thông tin Phòng Hiện tại
+            </h3>
+            {currentRoom ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-gray-600">Số phòng</span>
+              <span className="text-gray-800 font-semibold">{currentRoom.roomName}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-gray-600">Ngày nhận phòng</span>
+              <span className="text-gray-800 font-semibold">{formatDate(currentRoom.startDate)}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-gray-600">Loại phòng</span>
+              <span className="text-gray-800 font-semibold">{currentRoom.roomType}</span>
+            </div>
+            <div className="flex flex-col">
+              <span className="text-sm font-medium text-gray-600">Giá</span>
+              <span className="text-gray-800 font-semibold">
+            {currentRoom.price.toLocaleString()} VND
+              </span>
+            </div>
+          </div>
+            ) : (
+          <p className="text-gray-500 italic">Không có phòng hiện tại.</p>
+            )}
+          </div>
+        </TabsContent>
 
-            <TabsContent value="history" className="mt-0">
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Room History</h3>
-                {roomHistory && roomHistory.length > 0 ? (
-                  <div className="space-y-4">
-                    {roomHistory.map((rental) => (
-                      <div
-                        key={rental.id}
-                        className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-50 rounded-md border border-gray-200 hover:bg-gray-100 transition-colors"
-                      >
-                        <div className="space-y-1">
-                          <div className="flex items-center space-x-2">
-                            <span className="font-semibold text-gray-800">{rental.roomName}</span>
-                            <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
-                              Expired
-                            </Badge>
-                          </div>
-                          <p className="text-sm text-gray-600">
-                            {formatDate(rental.startDate)} - {formatDate(rental.endDate)}
-                          </p>
-                          <p className="text-sm text-gray-600">Room Type: {rental.roomType}</p>
-                        </div>
-                        <div className="mt-2 sm:mt-0">
-                          <p className="text-sm font-medium text-gray-600">Price</p>
-                          <p className="text-gray-800 font-semibold">
-                            {rental.price.toLocaleString()} VND
-                          </p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500 italic">Không có lịch sử phòng.</p>
-                )}
+        <TabsContent value="history" className="mt-0">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Lịch sử Phòng</h3>
+            {roomHistory && roomHistory.length > 0 ? (
+          <div className="space-y-4">
+            {roomHistory.map((rental) => (
+              <div
+            key={rental.id}
+            className="flex flex-col sm:flex-row justify-between items-start sm:items-center p-4 bg-gray-50 rounded-md border border-gray-200 hover:bg-gray-100 transition-colors"
+              >
+            <div className="space-y-1">
+              <div className="flex items-center space-x-2">
+                <span className="font-semibold text-gray-800">{rental.roomName}</span>
+                <Badge variant="outline" className="bg-yellow-100 text-yellow-800">
+              Hết hạn
+                </Badge>
               </div>
-            </TabsContent>
+              <p className="text-sm text-gray-600">
+                {formatDate(rental.startDate)} - {formatDate(rental.endDate)}
+              </p>
+              <p className="text-sm text-gray-600">Loại phòng: {rental.roomType}</p>
+            </div>
+            <div className="mt-2 sm:mt-0">
+              <p className="text-sm font-medium text-gray-600">Giá</p>
+              <p className="text-gray-800 font-semibold">
+                {rental.price.toLocaleString()} VND
+              </p>
+            </div>
+              </div>
+            ))}
+          </div>
+            ) : (
+          <p className="text-gray-500 italic">Không có lịch sử phòng.</p>
+            )}
+          </div>
+        </TabsContent>
 
-            <TabsContent value="violation" className="mt-0">
-              <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
-                <h3 className="text-lg font-semibold text-gray-800 mb-4">Violation Records</h3>
-                {violations && violations.length > 0 ? (
-                  <div className="space-y-3">
-                    {violations.map((violation) => (
-                      <div
-                        key={violation.id}
-                        className="flex justify-between items-center p-3 bg-red-50 rounded-md border-l-4 border-red-500 hover:bg-red-100 transition-colors"
-                      >
-                        <span className="font-medium text-gray-800">
-                          {violation.violationType}
-                        </span>
-                        <span className="text-sm text-gray-600">{formatDate(violation.reportDate)}</span>
-                      </div>
-                    ))}
-                  </div>
-                ) : (
-                  <p className="text-gray-500 italic">Không có vi phạm nào được ghi nhận.</p>
-                )}
+        <TabsContent value="violation" className="mt-0">
+          <div className="bg-white p-6 rounded-lg shadow-sm border border-gray-200">
+            <h3 className="text-lg font-semibold text-gray-800 mb-4">Danh sách Vi phạm</h3>
+            {violations && violations.length > 0 ? (
+          <div className="space-y-3">
+            {violations.map((violation) => (
+              <div
+            key={violation.id}
+            className="flex justify-between items-center p-3 bg-red-50 rounded-md border-l-4 border-red-500 hover:bg-red-100 transition-colors"
+              >
+            <span className="font-medium text-gray-800">
+              {violation.violationType}
+            </span>
+            <span className="text-sm text-gray-600">{formatDate(violation.reportDate)}</span>
               </div>
-            </TabsContent>
+            ))}
+          </div>
+            ) : (
+          <p className="text-gray-500 italic">Không có vi phạm nào được ghi nhận.</p>
+            )}
+          </div>
+        </TabsContent>
           </Tabs>
         </CardContent>
       </Card>

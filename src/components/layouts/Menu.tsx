@@ -82,9 +82,9 @@ const menuItems = [
       },
       {
         icon: <MegaphoneIcon className="w-6 h-6" />,
-        label: "Announcements",
+        label: "Notificaions",
         name: "Thông báo",
-        href: "/announcements",
+        href: "/notifications",
         visible: ["ADMIN", "STUDENT", "STAFF"],
       },
     ],
@@ -118,7 +118,7 @@ const menuItems = [
 ];
 
 
-const Menu = ({ numberMessage }: { numberMessage: number }) => {
+const Menu = () => {
   const pathname = usePathname();
   const context = useContext(UnreadMessagesContext);
   const unreadCount = context?.unreadCount || 0;

@@ -1,7 +1,6 @@
 // components/Stats.tsx
 import {
   DocumentChartBarIcon,
-  // CurrencyDollarIcon,
   CalendarIcon,
   BuildingOfficeIcon,
   UserGroupIcon,
@@ -27,13 +26,7 @@ const staticStats: Stat[] = [
     bgColor: "bg-blue-100/80",
     textColor: "text-blue-500",
   },
-  // {
-  //   title: "Revenue",
-  //   value: "$96k",
-  //   icon: <CurrencyDollarIcon className="w-8 h-8 text-green-500" />,
-  //   bgColor: "bg-green-100/80",
-  //   textColor: "text-green-500",
-  // },
+ 
   {
     title: "Events",
     value: "696",

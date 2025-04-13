@@ -13,6 +13,7 @@ export interface Room {
 }
 
 export interface Device {
+  id: number;
   deviceName: string;
   quantity: number;
 }

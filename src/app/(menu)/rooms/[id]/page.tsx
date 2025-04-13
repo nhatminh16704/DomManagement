@@ -9,6 +9,8 @@ import {
   ChartPieIcon,
   HomeIcon,
 } from "@heroicons/react/24/outline";
+import { Button } from "@/components/ui/button";
+import { Trash2, PenSquare } from "lucide-react";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import { RoomDetail, getRoomDetail } from "@/services/roomService";
@@ -23,7 +25,13 @@ import {
   DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { getStudentByAccountIdFromStudent, Student } from "@/services/studentService";
+import {
+  getStudentByAccountIdFromStudent,
+  Student,
+} from "@/services/studentService";
+import { toast } from "react-toastify";
+import { Device } from "@/services/roomService";
+import { DeviceRoom, updateDeviceQuantity, deleteDeviceRoom, getDevices, addDeviceToRoom } from "@/services/deviceRoomService";
 
 export type roomRentalRequest = {
   roomId: number;
@@ -36,7 +44,72 @@ export type PaymentRequest = {
   idRef: number;
 };
 
+
 export default function RoomDetailPage() {
+  const [isEditDialogOpen, setIsEditDialogOpen] = useState<boolean>(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState<boolean>(false);
+  const [editDevice, setEditDevice] = useState<Device | null>(null);
+  const [deviceToDelete, setDeviceToDelete] = useState<Device | null>(null);
+  const [newQuantity, setNewQuantity] = useState<number>(0);
+
+  const handleUpdateDevice = async () => {
+    if (!editDevice) return;
+
+    try {
+      const deviceRoomUpdate: DeviceRoom = {
+        roomId: Number(id),
+        deviceId: editDevice.id,
+        newQuantity: newQuantity
+      };
+      
+      await updateDeviceQuantity(deviceRoomUpdate);
+      
+      // Update the local state to reflect the change
+      if (roomDetail) {
+        const updatedDevices = roomDetail.devices.map(device => 
+          device.id === editDevice.id ? {...device, quantity: newQuantity} : device
+        );
+        setRoomDetail({...roomDetail, devices: updatedDevices});
+      }
+      
+      toast.success("Cập nhật số lượng thiết bị thành công");
+    } catch (error) {
+      console.error("Error updating device quantity:", error);
+      toast.error("Cập nhật số lượng thiết bị thất bại");
+    } finally {
+      setIsEditDialogOpen(false);
+    }
+  };
+
+  const handleDeleteDevice = async () => {
+    if (!deviceToDelete) return;
+
+    try {
+      const deviceToDeleteData: DeviceRoom = {
+        roomId: Number(id),
+        deviceId: deviceToDelete.id,
+        newQuantity: 0 // Not needed for deletion but included for consistency
+      };
+      
+      await deleteDeviceRoom(deviceToDeleteData);
+      
+      // Update the local state to remove the deleted device
+      if (roomDetail) {
+        const updatedDevices = roomDetail.devices.filter(
+          device => device.id !== deviceToDelete.id
+        );
+        setRoomDetail({...roomDetail, devices: updatedDevices}); //Override the devices array in roomDetail
+      }
+      
+      toast.success("Thiết bị đã được xóa thành công");
+    } catch (error) {
+      console.error("Error deleting device:", error);
+      toast.error("Xóa thiết bị thất bại");
+    } finally {
+      setIsDeleteDialogOpen(false);
+    }
+  };
+
   const { id } = useParams();
   const [roomDetail, setRoomDetail] = useState<RoomDetail | null>(null);
   const [student, setstudent] = useState<Student | null>(null);
@@ -72,6 +145,7 @@ export default function RoomDetailPage() {
       );
     }
   }, [id, status]);
+
   useEffect(() => {
     setIsVisible(true);
     setTimeout(() => {
@@ -79,7 +153,6 @@ export default function RoomDetailPage() {
       setPaymentStatus(null);
     }, 2000);
   }, [paymentStatus]);
-
 
   useEffect(() => {
     const fetchStudent = async () => {
@@ -95,6 +168,71 @@ export default function RoomDetailPage() {
       fetchStudent();
     }
   }, [userId, role]);
+
+  const [isAddDeviceDialogOpen, setIsAddDeviceDialogOpen] = useState<boolean>(false);
+  const [availableDevices, setAvailableDevices] = useState<Device[]>([]);
+  const [selectedDeviceId, setSelectedDeviceId] = useState<number | null>(null);
+  const [addQuantity, setAddQuantity] = useState<number>(1);
+
+  // Fetch available devices
+  useEffect(() => {
+    const fetchAvailableDevices = async () => {
+      try {
+        // Use the imported getDevices function
+        const allDevices = await getDevices();
+        
+        // Filter out devices already in the room
+        const filteredDevices = allDevices.filter((device: Device) => 
+          !roomDetail?.devices.some(existingDevice => existingDevice.id === device.id)
+        );
+        setAvailableDevices(filteredDevices);
+      } catch (error) {
+        console.error("Error fetching available devices:", error);
+        toast.error("Không thể tải danh sách thiết bị");
+      }
+    };
+
+    if (isAddDeviceDialogOpen) {
+      fetchAvailableDevices();
+    }
+  }, [isAddDeviceDialogOpen, roomDetail]);
+
+  const handleAddDevice = async () => {
+    if (!selectedDeviceId) {
+      toast.error("Vui lòng chọn thiết bị");
+      return;
+    }
+
+    try {
+      const deviceRoomAdd: DeviceRoom = {
+        roomId: Number(id),
+        deviceId: selectedDeviceId,
+        newQuantity: addQuantity
+      };
+      
+      await addDeviceToRoom(deviceRoomAdd);
+      
+      // Find the added device from available devices
+      const addedDevice = availableDevices.find(device => device.id === selectedDeviceId);
+      
+      if (addedDevice && roomDetail) {
+        // Add the new device to the room's devices list
+        const newDevice = { ...addedDevice, quantity: addQuantity };
+        setRoomDetail({
+          ...roomDetail, 
+          devices: [...roomDetail.devices, newDevice]
+        });
+      }
+      
+      toast.success("Thêm thiết bị thành công");
+      setSelectedDeviceId(null);
+      setAddQuantity(1);
+      setIsAddDeviceDialogOpen(false);
+    } catch (error) {
+      console.error("Error adding device:", error);
+      toast.error("Thêm thiết bị thất bại");
+    }
+  };
 
   if (!roomDetail) {
     return <div className="p-8">Không tìm thấy phòng</div>;
@@ -298,9 +436,20 @@ export default function RoomDetailPage() {
             </TabsContent>
 
             <TabsContent value="devices">
-              <h2 className="text-xl font-semibold mb-4">
-                Thiết bị trong phòng này
-              </h2>
+              <div className="flex justify-between items-center mb-4">
+                <h2 className="text-xl font-semibold">
+                  Thiết bị trong phòng này
+                </h2>
+                {role === "ADMIN" && (
+                    <button
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 flex items-center"
+                    onClick={() => setIsAddDeviceDialogOpen(true)}
+                    >
+                    <span className="mr-2">+</span>
+                    Thêm thiết bị
+                    </button>
+                )}
+              </div>
               {devices && devices.length > 0 ? (
                 <div className="overflow-x-auto">
                   <table className="min-w-full divide-y divide-gray-200">
@@ -312,6 +461,11 @@ export default function RoomDetailPage() {
                         <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                           Số lượng
                         </th>
+                        {role === "ADMIN" && (
+                          <th className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
+                            Thao tác
+                          </th>
+                        )}
                       </tr>
                     </thead>
                     <tbody className="bg-white divide-y divide-gray-200">
@@ -323,6 +477,35 @@ export default function RoomDetailPage() {
                           <td className="px-6 py-4 whitespace-nowrap">
                             {device.quantity}
                           </td>
+                          {role === "ADMIN" && (
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <div className="flex space-x-2">
+                                <Button
+                                  size="icon"
+                                  className="h-10 w-10 bg-lightsuccess text-success hover:bg-success hover:text-white transition-colors"
+                                  title="Chỉnh sửa"
+                                  onClick={() => {
+                                    setEditDevice(device);
+                                    setNewQuantity(device.quantity);
+                                    setIsEditDialogOpen(true);
+                                  }}
+                                >
+                                  <PenSquare className="h-6 w-6" />
+                                </Button>
+                                <Button
+                                  size="icon"
+                                  className="h-10 w-10 bg-lighterror text-error hover:bg-error hover:text-white transition-colors"
+                                  title="Xóa thiết bị"
+                                  onClick={() => {
+                                    setDeviceToDelete(device);
+                                    setIsDeleteDialogOpen(true);
+                                  }}
+                                >
+                                  <Trash2 className="h-6 w-6" />
+                                </Button>
+                              </div>
+                            </td>
+                          )}
                         </tr>
                       ))}
                     </tbody>
@@ -355,6 +538,114 @@ export default function RoomDetailPage() {
           </div>
         </div>
       )}
+
+      {/* Edit Device Dialog */}
+      <Dialog open={isEditDialogOpen} onOpenChange={setIsEditDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Chỉnh sửa thiết bị</DialogTitle>
+            <DialogDescription>
+              Cập nhật số lượng thiết bị {editDevice?.deviceName}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="quantity" className="text-right">
+                Số lượng
+              </label>
+              <input
+                id="quantity"
+                type="number"
+                className="col-span-3 p-2 border rounded-md"
+                value={newQuantity}
+                onChange={(e) => setNewQuantity(Number(e.target.value))}
+                min="0"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsEditDialogOpen(false)}>
+              Hủy
+            </Button>
+            <Button className="bg-blue-500 hover:bg-blue-600 text-white" onClick={handleUpdateDevice}>Lưu thay đổi</Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Delete Device Confirmation Dialog */}
+      <Dialog open={isDeleteDialogOpen} onOpenChange={setIsDeleteDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Xác nhận xóa thiết bị</DialogTitle>
+            <DialogDescription>
+              Bạn có chắc chắn muốn xóa thiết bị {deviceToDelete?.deviceName}?
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsDeleteDialogOpen(false)}>
+              Hủy
+            </Button>
+            <Button variant="destructive" onClick={handleDeleteDevice}>
+              Xác nhận xóa
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Add Device Dialog */}
+      <Dialog open={isAddDeviceDialogOpen} onOpenChange={setIsAddDeviceDialogOpen}>
+        <DialogContent className="sm:max-w-[425px]">
+          <DialogHeader>
+            <DialogTitle>Thêm thiết bị mới</DialogTitle>
+            <DialogDescription>
+              Chọn thiết bị và số lượng bạn muốn thêm vào phòng
+            </DialogDescription>
+          </DialogHeader>
+          <div className="grid gap-4 py-4">
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="device" className="text-right">
+                Thiết bị
+              </label>
+              <select
+                id="device"
+                className="col-span-3 p-2 border rounded-md"
+                value={selectedDeviceId || ''}
+                onChange={(e) => setSelectedDeviceId(Number(e.target.value))}
+              >
+                <option value="">Chọn thiết bị</option>
+                {availableDevices.map((device) => (
+                  <option key={device.id} value={device.id}>
+                    {device.deviceName}
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="grid grid-cols-4 items-center gap-4">
+              <label htmlFor="addQuantity" className="text-right">
+                Số lượng
+              </label>
+              <input
+                id="addQuantity"
+                type="number"
+                className="col-span-3 p-2 border rounded-md"
+                value={addQuantity}
+                onChange={(e) => setAddQuantity(Number(e.target.value))}
+                min="1"
+              />
+            </div>
+          </div>
+          <DialogFooter>
+            <Button variant="outline" onClick={() => setIsAddDeviceDialogOpen(false)}>
+              Hủy
+            </Button>
+            <Button className="bg-green-500 hover:bg-green-600 text-white" onClick={handleAddDevice}>
+              Thêm thiết bị
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      
 
       {
         <Dialog open={regist} onOpenChange={(open) => setRegist(open)}>

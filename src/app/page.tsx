@@ -4,10 +4,11 @@ import { useEffect, useState } from "react";
 import {
   DocumentTextIcon,
   CurrencyDollarIcon,
-  CalendarIcon,
   BuildingOfficeIcon,
   UserGroupIcon,
   UsersIcon,
+  MegaphoneIcon
+
 } from "@heroicons/react/24/outline";
 import Chart from "@/components/charts/Chart";
 import DonutChart from "@/components/charts/DonutChart";
@@ -46,9 +47,9 @@ export default function Home() {
       textColor: "text-green-500",
     },
     {
-      title: "Sự kiện",
-      value: "69",
-      icon: <CalendarIcon className="w-8 h-8 text-red-500" />,
+      title: "Thông báo",
+      value: dashboardData?.notificationCount?.toString() || "0",
+      icon: <MegaphoneIcon className="w-8 h-8 text-red-500" />,
       bgColor: "bg-red-100/80",
       textColor: "text-red-500",
     },

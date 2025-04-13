@@ -103,7 +103,7 @@ export default function Events() {
                 }`}
             onClick={()=>setShowForm(true)}
            >
-              Đăng ký
+              Tạo mới
             </button>
           </div>
         </div>

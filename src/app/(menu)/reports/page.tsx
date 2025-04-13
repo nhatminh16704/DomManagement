@@ -58,7 +58,12 @@ export default function Reports() {
 
   const refreshReports = () => {
     getReports()
-      .then((data) => setReports(data))
+      .then((data) => {
+        const sortedData = [...data].sort((a, b) => 
+          new Date(b.sentDate).getTime() - new Date(a.sentDate).getTime()
+        );
+        setReports(sortedData);
+      })
       .catch((err) => console.error("Lỗi khi lấy danh sách báo cáo:", err));
   };
 
@@ -155,7 +160,7 @@ export default function Reports() {
     <div className="container mx-auto p-4">
       <div className="text-center mb-8">
         <h1 className="text-4xl font-bold text-center text-primary relative pb-3 after:content-[''] after:absolute after:w-24 after:h-1 after:bg-primary after:bottom-0 after:left-1/2 after:-translate-x-1/2">
-          Reports Management
+          Quản lý báo cáo
         </h1>
       </div>
 
@@ -166,7 +171,7 @@ export default function Reports() {
           onClick={() => handleFilterByStatus(null)}
         >
           <div className="text-center">
-            <div className="text-sm font-bold text-info mb-2">TOTAL</div>
+            <div className="text-sm font-bold text-info mb-2">Tấc cả</div>
             <p className="text-3xl font-bold text-info">{stats.totalReports}</p>
           </div>
         </div>
@@ -175,7 +180,7 @@ export default function Reports() {
           onClick={() => handleFilterByStatus("pending")}
         >
           <div className="text-center">
-            <div className="text-sm font-bold text-error mb-2">PENDING</div>
+            <div className="text-sm font-bold text-error mb-2">Chờ xử lý</div>
             <p className="text-3xl font-bold text-error">{stats.pendingReports}</p>
           </div>
         </div>
@@ -184,7 +189,7 @@ export default function Reports() {
           onClick={() => handleFilterByStatus("inprogress")}
         >
           <div className="text-center">
-            <div className="text-sm font-bold text-warning mb-2">INPROGRESS</div>
+            <div className="text-sm font-bold text-warning mb-2">Đang xử lý</div>
             <p className="text-3xl font-bold text-warning">{stats.inProgressReports}</p>
           </div>
         </div>
@@ -193,7 +198,7 @@ export default function Reports() {
           onClick={() => handleFilterByStatus("resolved")}
         >
           <div className="text-center">
-            <div className="text-sm font-bold text-success mb-2">RESOLVED</div>
+            <div className="text-sm font-bold text-success mb-2">Đã xử lý</div>
             <p className="text-3xl font-bold text-success">{stats.resolvedReports}</p>
           </div>
         </div>

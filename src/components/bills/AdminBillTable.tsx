@@ -23,7 +23,12 @@ export default function AdminBillTable() {
   const [selectedMonth, setSelectedMonth] = useState(
     new Date().toISOString().slice(0, 7) // Current month in YYYY-MM format
   );
+  const [searchTerm, setSearchTerm] = useState("");
   const [endReadings, setEndReadings] = useState<Record<number, number | string>>({});
+
+  const filteredBills = bills.filter((bill) => 
+    bill.roomName.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
 
   const fetchBills = async () => {
@@ -46,7 +51,7 @@ export default function AdminBillTable() {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4">Bills</h1>
+      <h1 className="text-2xl font-bold mb-4">Hoá đơn</h1>
       <div className="flex mb-4 gap-2">
         <select
           className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
@@ -55,9 +60,9 @@ export default function AdminBillTable() {
             setSelectedStatus(e.target.value);
           }}
         >
-          <option value="PENDING">Pending</option>
-          <option value="PAID">Paid</option>
-          <option value="UNPAID">Unpaid</option>
+          <option value="PENDING">Chưa cập nhật</option>
+          <option value="PAID">Đã thanh toán</option>
+          <option value="UNPAID">Chưa thanh toán</option>
         </select>
 
         <input
@@ -65,6 +70,7 @@ export default function AdminBillTable() {
           className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
           value={selectedMonth}
           onChange={(e) => setSelectedMonth(e.target.value)}
+          lang="vi-VN"
         />
 
         <button
@@ -73,24 +79,35 @@ export default function AdminBillTable() {
             fetchBills();
           }}
         >
-          Apply
+          Áp dụng
         </button>
+
+        <input
+          type="text"
+          placeholder="Tìm theo tên phòng..."
+          className="px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+          onChange={(e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            setSearchTerm(searchTerm);
+          }}
+        />
       </div>
+
       <div className="overflow-x-auto">
         <Table>
-          <TableCaption>List of all bills</TableCaption>
-          <TableHeader>
+            <TableCaption>Danh sách hóa đơn</TableCaption>
+            <TableHeader>
             <TableRow>
-              <TableHead>Room</TableHead>
-              <TableHead>Bill Month</TableHead>
-              <TableHead>Electricity Start</TableHead>
-              <TableHead>Electricity End</TableHead>
-              <TableHead>Total Amount</TableHead>
-              <TableHead>Status</TableHead>
+              <TableHead>Phòng</TableHead>
+              <TableHead>Tháng</TableHead>
+              <TableHead>Số điện đầu</TableHead>
+              <TableHead>Số điện cuối</TableHead>
+              <TableHead>Tổng tiền</TableHead>
+              <TableHead>Trạng thái</TableHead>
             </TableRow>
-          </TableHeader>
+            </TableHeader>
           <TableBody>
-            {bills.map((bill) => (
+            {filteredBills.map((bill) => (
               <TableRow key={bill.id}>
                 <TableCell>{bill.roomName}</TableCell>
                 <TableCell>
@@ -147,7 +164,7 @@ export default function AdminBillTable() {
                           }
                         }}
                       >
-                        Save
+                        Lưu
                       </button>
                     </div>
                   )}
