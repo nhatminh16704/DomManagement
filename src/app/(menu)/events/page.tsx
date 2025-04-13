@@ -147,17 +147,26 @@ export default function Events() {
                 minute: "2-digit",
               })}
             </div>
-            {event.isActive ? (
-              <div className="flex items-center text-gray-500 font-normal">
+            <div className="flex items-center text-gray-500 font-normal">
+            {event.isActive === "ACTIVE" && (
+              <>
                 Đang diễn ra
                 <span className="ml-2 w-3 h-3 rounded-full bg-green-500 inline-block"></span>
-              </div>
-            ) : (
-              <div className="flex items-center text-gray-500 font-normal">
-                Đã kết thúc   
-                <span className="ml-2 w-3 h-3 rounded-full bg-red-500 inline-block"></span>
-              </div>
+              </>
             )}
+            {event.isActive === "ENDED" && (
+              <>
+                Đã kết thúc
+                <span className="ml-2 w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+              </>
+            )}
+            {event.isActive === "NOT_STARTED" && (
+              <>
+                Chưa bắt đầu
+                <span className="ml-2 w-3 h-3 rounded-full bg-yellow-400 inline-block"></span>
+              </>
+            )}
+            </div>
           </div>
         );
       })}

@@ -7,7 +7,7 @@ export type event={
     name: string,
     startDate: Date,
     endDate: Date,
-    isActive: boolean
+    isActive: "NOT_STARTED" | "ACTIVE" | "ENDED"
 }
 
 export type createEvent={
