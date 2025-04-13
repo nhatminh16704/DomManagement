@@ -108,11 +108,17 @@ export default function Messages() {
     console.error(newmessage);
     try {
       await createmessage(newmessage);
-      alert("Tin nhắn đã được gửi");
+      toast.success("Tin nhắn đã được gửi");
       setShowForm(false);
+      // Refresh messages after sending
+      const fetchedMessages = await getMessages();
+      fetchedMessages.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      setMessages(fetchedMessages);
     } catch (e) {
       console.error("Lỗi:", e);
-      alert("Gửi tin nhắn thất bại!");
+      toast.error("Gửi tin nhắn thất bại!");
     }
   };
 

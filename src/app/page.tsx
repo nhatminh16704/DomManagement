@@ -41,7 +41,7 @@ export default function Home() {
     },
     {
       title: "Doanh thu",
-      value: dashboardData ? `${dashboardData.revenue.toLocaleString()} ₫` : "$0",
+      value: dashboardData ? `${dashboardData.revenue?.toLocaleString()} ₫` : "$0",
       icon: <CurrencyDollarIcon className="w-8 h-8 text-green-500" />,
       bgColor: "bg-green-100/80",
       textColor: "text-green-500",
