@@ -120,24 +120,24 @@ export default function Staffs() {
         </h1>
 
         <div className="flex items-center gap-4">
-          <Button
+            <Button
             className="bg-colorprimary hover:bg-colorprimary/90 text-white"
             onClick={handleAddStaff}
-          >
+            >
             Thêm nhân viên
-          </Button>
-          <AddStaffModal
+            </Button>
+            <AddStaffModal
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             onStaffAdded={refreshStaffs}
             staff={selectedStaff}
-          />
-          <ConfirmDialog
+            />
+            <ConfirmDialog
             isOpen={isConfirmOpen}
             onClose={() => setIsConfirmOpen(false)}
-            message="Are you sure you want to delete this staff?"
+            message="Bạn có chắc chắn muốn xóa nhân viên này không?"
             onConfirm={handleDelete}
-          />
+            />
           <div className="hidden md:flex items-center gap-2 text-sm rounded-full ring-[1.5px] ring-gray-300 px-3 py-1 transition-all hover:ring-gray-400 hover:ring-2 focus-within:ring-colorprimary focus-within:ring-2 group">
             <Image
               src="/search.png"

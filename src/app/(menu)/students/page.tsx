@@ -129,30 +129,30 @@ export default function Students() {
         </h1>
 
         <div className="flex items-center gap-4">
-          <Button
+            <Button
             className="bg-colorprimary hover:bg-colorprimary/90 text-white"
             onClick={handleAddStudent}
-          >
+            >
             Thêm sinh viên
-          </Button>
-          <AddStudentModal
+            </Button>
+            <AddStudentModal
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             onStudentAdded={refreshStudents}
             student={selectedStudent}
-          />
-          <AddViolationModal
+            />
+            <AddViolationModal
             isOpen={isViolationOpen}
             onClose={() => setIsViolationOpen(false)}
             studentId={selectedStudentId!}
             onViolationAdded={refreshStudents}
-          />
-          <ConfirmDialog
+            />
+            <ConfirmDialog
             isOpen={isConfirmOpen}
             onClose={() => setIsConfirmOpen(false)}
-            message="Are you sure you want to delete this student?"
+            message="Bạn có chắc chắn muốn xóa sinh viên này không?"
             onConfirm={handleDelete}
-          />
+            />
           <div className="hidden md:flex items-center gap-2 text-sm rounded-full ring-[1.5px] ring-gray-300 px-3 py-1 transition-all hover:ring-gray-400 hover:ring-2 focus-within:ring-colorprimary focus-within:ring-2 group">
             <Image
               src="/search.png"
