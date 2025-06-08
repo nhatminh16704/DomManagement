@@ -1,7 +1,8 @@
 'use client';
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'next/navigation';
-import { MessageDetail, getMessageById } from '@/services/messageService';
+import { getMessageById } from '@/services/messageService';
+import { MessageDetail } from '@/types/message';
 import { toast } from 'react-toastify';
 import { ArrowLeftIcon, ClockIcon, UserCircleIcon } from '@heroicons/react/24/outline';
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
@@ -48,7 +49,7 @@ export default function MessageDetailPage() {
                 className="flex items-center text-gray-600 hover:text-gray-800 transition-colors"
               >
                 <ArrowLeftIcon className="h-6 w-6 mr-2" />
-                <span className="font-medium">Back</span>
+                <span className="font-medium">Quay lại</span>
               </button>
               <div className="flex items-center text-sm text-gray-500">
                 <ClockIcon className="h-5 w-5 mr-1.5" />
@@ -58,7 +59,7 @@ export default function MessageDetailPage() {
             <CardTitle className="text-3xl font-bold text-gray-900">{message.title}</CardTitle>
             <div className="flex items-center text-gray-600">
               <UserCircleIcon className="h-6 w-6 mr-2" />
-              <span className="text-sm">From: {message.sentBy}</span>
+              <span className="text-sm">Gửi từ: {message.sentBy}</span>
             </div>
           </CardHeader>
           

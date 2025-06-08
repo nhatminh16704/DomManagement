@@ -1,25 +1,11 @@
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/auth";
-
-// Định nghĩa kiểu dữ liệu cho payload của JWT (tùy chỉnh theo back-end)
-interface JwtPayload {
-  sub: string; // username hoặc id
-  role?: string; // vai trò người dùng (admin/user)
-  exp: number; // thời gian hết hạn (timestamp)
-  id: number; // id người dùng
-  iat: number; // thời gian phát hành (timestamp)
-}
-
-// Định nghĩa kiểu dữ liệu cho thông tin đăng nhập
-interface LoginCredentials {
-  username: string;
-  password: string;
-}
+import { LoginCredentials, JwtPayload } from "../types/auth";
+import { ApiResponse } from "../types/api";
 
 class AuthService {
-  private apiUrl: string = API_URL; // URL back-end
-  private tokenKey: string = "token"; // Key lưu token trong localStorage
+  private apiUrl: string = API_URL; 
+  private tokenKey: string = "token";
 
-  // Đăng nhập và lấy JWT
   async login(credentials: LoginCredentials): Promise<string> {
     try {
       const response = await fetch(`${this.apiUrl}/login`, {
@@ -31,12 +17,19 @@ class AuthService {
       });
 
       if (!response.ok) {
-        const errorMessage = await response.text();
-        throw new Error(errorMessage || "Đăng nhập thất bại!");
+        const errorResponse: ApiResponse<null> = await response.json();
+        const errorMessage = errorResponse.message || `HTTP ${response.status}: ${response.statusText}`;
+        throw new Error(errorMessage);
       }
 
-      const jwtToken = await response.text();
-      localStorage.setItem(this.tokenKey, jwtToken); // Lưu token
+      const apiResponse: ApiResponse<string> = await response.json();
+      
+      if (!apiResponse.success) {
+        throw new Error(apiResponse.message);
+      }
+
+      const jwtToken = apiResponse.data;
+      localStorage.setItem(this.tokenKey, jwtToken);
       return jwtToken;
     } catch (error: unknown) {
       const errorMessage =
@@ -45,25 +38,23 @@ class AuthService {
     }
   }
 
-  // Đăng xuất
   logout(): void {
     localStorage.removeItem(this.tokenKey);
-    // Nếu dùng cookie: document.cookie = `${this.tokenKey}=; expires=Thu, 01 Jan 1970 00:00:00 GMT`;
   }
 
-  // Lấy token từ localStorage
+
   getToken(): string | null {
     return localStorage.getItem(this.tokenKey);
   }
 
-  // Kiểm tra xem người dùng đã đăng nhập chưa
+
   isAuthenticated(): boolean {
     const token = this.getToken();
     if (!token) return false;
     return !this.isTokenExpired(token);
   }
 
-  // Giải mã payload từ JWT
+
   getPayload(token?: string): JwtPayload | null {
     const currentToken = token || this.getToken();
     if (!currentToken) return null;
@@ -78,20 +69,20 @@ class AuthService {
     }
   }
 
-  // Lấy role từ token
+
   getRole(): string | null {
     const payload = this.getPayload();
     return payload?.role || null;
   }
 
-  // Kiểm tra token có hết hạn không
+
   isTokenExpired(token?: string): boolean {
     const payload = this.getPayload(token);
     if (!payload || !payload.exp) return true;
-    return payload.exp * 1000 < Date.now(); // Chuyển từ giây sang mili giây
+    return payload.exp * 1000 < Date.now();
   }
 
-  // Lấy tên người dùng/subject từ token
+
   getUsername(): string | null {
     const payload = this.getPayload();
     return payload?.sub || null;
@@ -103,4 +94,7 @@ class AuthService {
   }
 }
 
-export default new AuthService(); // Export instance singleton
+// Export instance (singleton)
+const authService = new AuthService();
+export default authService;
+

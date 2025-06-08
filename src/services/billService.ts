@@ -1,26 +1,5 @@
-export type RoomBill = {
-  id: number;
-  roomId: number;
-  roomName: string;
-  billMonth: string;
-  electricityStart: number;
-  electricityEnd: number;
-  totalAmount: number;
-  status: "PAID" | "UNPAID" | "PENDING";
-};
-
-export type requestBill = {
-  amount : number,
-  bankCode : string,
-  idRef : number
-}
-
-// You might also want to define an enum for the status values
-export enum BillStatus {
-  PAID = "PAID",
-  UNPAID = "UNPAID",
-  PENDING = "PENDING_READING",
-}
+import { RoomBill, requestBill } from "@/types/room";
+import { ApiResponse } from "@/types/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/room-bills";
 
@@ -39,7 +18,8 @@ export const getAllBills = async (): Promise<RoomBill[]> => {
       );
     }
 
-    return await response.json();
+    const data: ApiResponse<RoomBill[]> = await response.json();
+    return data.data;
   } catch (error) {
     console.error("Error fetching bills:", error);
     throw error;
@@ -66,7 +46,8 @@ export const getBillsByMonthAndStatus = async (
       throw new Error(`Failed to fetch bills: ${response.status}`);
     }
 
-    return await response.json();
+    const data: ApiResponse<RoomBill[]> = await response.json();
+    return data.data;
   } catch (error) {
     console.error("Error fetching bills by month and status:", error);
     throw error;
@@ -99,7 +80,8 @@ export const updateElectricityReading = async (
       );
     }
 
-    return await response.json();
+    const data: ApiResponse<RoomBill> = await response.json();
+    return data.data;
   } catch (error) {
     console.error("Error updating electricity reading:", error);
     throw error;
@@ -121,16 +103,15 @@ export const getStudentBills = async (): Promise<RoomBill[]> => {
       );
     }
 
-    return await response.json();
+    const data: ApiResponse<RoomBill[]> = await response.json();
+    return data.data;
   } catch (error) {
     console.error("Error fetching student bills:", error);
     throw error;
   }
 };
 
-
-
-export async function payBill(billRequest: requestBill) {
+export async function payBill(billRequest: requestBill): Promise<string> {
   try {
     const token = localStorage.getItem('token');
     const response = await fetch(process.env.NEXT_PUBLIC_API_URL +'/vnpay/createBillPayment', {
@@ -140,15 +121,16 @@ export async function payBill(billRequest: requestBill) {
           "Content-Type": "application/json" 
       },
       body: JSON.stringify(billRequest),
-  });
-  if (!response.ok) {
-    const errorMessage = await response.text(); 
-    return errorMessage; 
-  }
-  return await response.text();
+    });
+    
+    if (!response.ok) {
+      const errorMessage = await response.text(); 
+      return errorMessage; 
+    }
+    
+    return await response.text();
   } catch (error) {
     console.error(error);
     throw error;
   }
-      
 }

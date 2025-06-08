@@ -1,29 +1,16 @@
-
-
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/notifications";
-export type notification = {
-    id: number;
-    name_person_create: string;
-    title: string;
-    content: string;
-    create_date: Date;
-    type: string;
-}
+import { Notification, createNotification } from "@/types/notification";
+import { ApiResponse } from "@/types/api";
 
-export type createNotification={
-    createdBy: number;
-    title: string;
-    content: string;
-    type: string;
-}
 const token = localStorage.getItem("token");
-export const getnotification = async (): Promise<notification[]> => {
+
+export const getnotification = async (): Promise<Notification[]> => {
     try{
         if (!token) {
             throw new Error("Không tìm thấy token!");
         }
 
-        const response = await fetch(API_URL + "/findAll", {
+        const response = await fetch(API_URL, {
             method: "GET",
             headers: {
                 "Authorization": `Bearer ${token}`, 
@@ -35,15 +22,15 @@ export const getnotification = async (): Promise<notification[]> => {
             throw new Error("Lỗi khi lấy dữ liệu thông báo");
         }
 
-        const data = await response.json();
-        return data;
+        const data: ApiResponse<Notification[]> = await response.json();
+        return data.data || [];
     }catch(error){
         console.error("Lỗi khi fetch dữ liệu thông báo : ",error);
         return [];
     }
 }
 
-export const getnotificationtype = async(type:string): Promise<notification[]> =>{
+export const getnotificationtype = async(type:string): Promise<Notification[]> =>{
     try{ 
         if (!token) {
             throw new Error("Không tìm thấy token!");
@@ -56,20 +43,21 @@ export const getnotificationtype = async(type:string): Promise<notification[]> =
                 "Content-Type": "application/json"
             }
         });
-        const notificationdata = await response.json();
-        return notificationdata;
-        }catch(error){
+        
+        const notificationdata: ApiResponse<Notification[]> = await response.json();
+        return notificationdata.data || [];
+    }catch(error){
         console.error(" lỗi khi fetch dữ liệu thông báo : ",error);
         return [];
     }
 }
 
-
-export const addnotification = async(notification: createNotification): Promise< String > =>{
+export const addnotification = async(notification: createNotification): Promise<string> =>{
     if (!token) {
         throw new Error("Người dùng chưa đăng nhập.");
     }
-    const response = await fetch(API_URL+ "/create",{
+    
+    const response = await fetch(API_URL,{
         method: "POST",
         headers: { 
             "Authorization": `Bearer ${token}`,
@@ -77,9 +65,12 @@ export const addnotification = async(notification: createNotification): Promise<
         },
         body: JSON.stringify(notification),
     })
+    
     if (!response.ok) {
         const errorText = await response.text();
         throw new Error(`Lỗi khi thêm thông báo: ${response.status} - ${errorText}`);
     }
-    return response.text();
+    
+    const result: ApiResponse<string> = await response.json();
+    return result.data || "";
 }

@@ -3,7 +3,8 @@ import React from 'react'
 import { useState, useEffect } from 'react';
 import { Button } from "@/components/ui/button";
 import Select from "react-select";
-import { addnotification, createNotification, getnotification, notification } from '@/services/notificationService';
+import { getnotification, addnotification } from '@/services/notificationService';
+import { Notification, createNotification } from '@/types/notification';
 import authService from '@/services/authService';
 import {
   Dialog,
@@ -16,9 +17,9 @@ import {
 
 export default function Announcements() {
   const [showForm, setShowForm] = useState(false);
-  const [allNotifications, setAllNotifications] = useState<notification[]>([]);
-  const [notifications, setnotification] = useState<notification[]>([]);
-  const [selectedNotification, setSelectedNotification] = useState<notification | null>(null);
+  const [allNotifications, setAllNotifications] = useState<Notification[]>([]);
+  const [notifications, setnotification] = useState<Notification[]>([]);
+  const [selectedNotification, setSelectedNotification] = useState<Notification | null>(null);
   const typeNotification= ['MAINTENANCE','SECURITY','RULES','URGENT']; 
   const typeNotificationVN=['BẢO TRÌ','AN NINH','QUY TẮC','CẤP BÁCH'];
   const [selected, setSelected] = useState<string>("");
@@ -110,7 +111,7 @@ export default function Announcements() {
             className="bg-blue-500"
             onClick={onclickall}
             >
-            All
+            Tấc cả
           </Button>      
           <Select
             key={selectKey}
@@ -141,9 +142,9 @@ export default function Announcements() {
               <div>
                 <p className="font-semibold text-gray-900">{item.title}</p>
               </div>
-              <span className="text-sm text-gray-400">{item?.create_date
-                      ? new Date(item.create_date).toLocaleDateString("vi-VN")
-                      : "Không có ngày"}</span>
+              {item?.createdDate
+                ? new Date(item.createdDate).toLocaleDateString("vi-VN")
+                : "Không có ngày"}
             </li>
           ))}
         </ul>
@@ -238,8 +239,8 @@ export default function Announcements() {
               <DialogDescription className="border rounded-md p-4 bg-gray-50 space-y-3 mt-2 text-gray-700">
               <span className="block mb-2"><strong>Tiêu đề:</strong> {selectedNotification.title}</span>
               <span className="block mb-2"><strong>Loại:</strong> {selectedNotification.type}</span>
-              <span className="block mb-2"><strong>Ngày tạo:</strong> {selectedNotification?.create_date
-                ? new Date(selectedNotification.create_date).toLocaleDateString("vi-VN")
+              <span className="block mb-2"><strong>Ngày tạo:</strong> {selectedNotification?.createdDate
+                ? new Date(selectedNotification.createdDate).toLocaleDateString("vi-VN")
                 : "Không có ngày"}
               </span>
               <span className="whitespace-pre-line mt-1 block mb-2"><strong>Nội dung:</strong>{selectedNotification.content}</span>

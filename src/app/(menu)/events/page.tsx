@@ -1,17 +1,16 @@
 "use client";
 import { createEvent, createrEvent, event, getAll } from '@/services/eventService';
-import { tree } from 'next/dist/build/templates/app-page';
 import { useState, useEffect } from 'react';
 import {
   Dialog,
   DialogContent,
   DialogHeader,
   DialogTitle,
-  DialogDescription,
   DialogFooter,
 } from "@/components/ui/dialog";
-import { number } from 'zod';
 import authService from '@/services/authService';
+import { toast } from "react-toastify";
+
 
 export default function Events() {
   const [event, setEvent] = useState<event[]>([]);
@@ -78,10 +77,16 @@ export default function Events() {
       endDate: formatDateToLocal(new Date(formData.endDate)),
     };
     createrEvent(newEvent).then(() => {
-      
       setShowForm(false);
+      getAll().then((data) => {
+        setEvent(data);
+        toast.success("Tạo sự kiện thành công!");
+      }).catch((err) => {
+        console.error("Lỗi khi lấy danh sách sự kiện:", err);
+      });
     }).catch((err) => {
       setError("Lỗi khi tạo sự kiện: " + err.message);
+      toast.error("Lỗi khi tạo sự kiện");
     });
   };
 
@@ -103,7 +108,7 @@ export default function Events() {
                 }`}
             onClick={()=>setShowForm(true)}
            >
-              Đăng ký
+              Tạo mới
             </button>
           </div>
         </div>
@@ -147,17 +152,34 @@ export default function Events() {
                 minute: "2-digit",
               })}
             </div>
-            {event.isActive ? (
-              <div className="flex items-center text-gray-500 font-normal">
-                Đang diễn ra
-                <span className="ml-2 w-3 h-3 rounded-full bg-green-500 inline-block"></span>
-              </div>
-            ) : (
-              <div className="flex items-center text-gray-500 font-normal">
-                Đã kết thúc   
-                <span className="ml-2 w-3 h-3 rounded-full bg-red-500 inline-block"></span>
-              </div>
-            )}
+            {(() => {
+              const now = new Date();
+              const startDate = new Date(event.startDate);
+              const endDate = new Date(event.endDate);
+              
+              if (now < startDate) {
+                return (
+                  <div className="flex items-center text-gray-500 font-normal">
+                    Chưa bắt đầu
+                    <span className="ml-2 w-3 h-3 rounded-full bg-yellow-500 inline-block"></span>
+                  </div>
+                );
+              } else if (now >= startDate && now <= endDate) {
+                return (
+                  <div className="flex items-center text-gray-500 font-normal">
+                    Đang diễn ra
+                    <span className="ml-2 w-3 h-3 rounded-full bg-green-500 inline-block"></span>
+                  </div>
+                );
+              } else {
+                return (
+                  <div className="flex items-center text-gray-500 font-normal">
+                    Đã kết thúc   
+                    <span className="ml-2 w-3 h-3 rounded-full bg-red-500 inline-block"></span>
+                  </div>
+                );
+              }
+            })()}
           </div>
         );
       })}

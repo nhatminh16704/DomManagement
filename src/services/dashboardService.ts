@@ -1,3 +1,5 @@
+import { ApiResponse } from "@/types/api";
+
 export interface Dashboard {
   reportCount: number;
   roomCount: number;
@@ -10,7 +12,7 @@ export interface Dashboard {
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/dashboard";
 
-export async function getDashboard(): Promise<Dashboard> {
+export async function getDashboard(): Promise<ApiResponse<Dashboard>> {
   try {
     const token = localStorage.getItem('token');
     const response = await fetch(`${API_URL}`, {
@@ -21,7 +23,8 @@ export async function getDashboard(): Promise<Dashboard> {
     if (!response.ok) {
       throw new Error("Error fetching dashboard data");
     }
-    return await response.json();
+    const apiResponse: ApiResponse<Dashboard> = await response.json();
+    return apiResponse;
   } catch (error) {
     console.error("Error fetching dashboard:", error);
     throw error;

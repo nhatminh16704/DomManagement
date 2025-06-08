@@ -20,8 +20,8 @@ export default function Home() {
   useEffect(() => {
     const fetchDashboardData = async () => {
       try {
-        const data = await getDashboard();
-        setDashboardData(data);
+        const res = await getDashboard();
+        setDashboardData(res.data);
       } catch (error) {
         console.error("Error fetching dashboard data:", error);
       }

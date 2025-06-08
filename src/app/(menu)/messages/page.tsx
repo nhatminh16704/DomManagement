@@ -1,16 +1,13 @@
 "use client";
 import { ChevronLeftIcon, ChevronRightIcon } from "@heroicons/react/24/outline";
 import {
-  markMessageAsRead,
-  getMessages,
-  Message,
-  searchUser,
-  UseSearchDTO,
-  MessageRequest,
   createmessage,
-  RoomSearchDTO,
+  getMessages,
+  markMessageAsRead,
   roomSearch,
+  searchUser,
 } from "@/services/messageService";
+import { Message, MessageRequest, UseSearchDTO, RoomSearchDTO } from "@/types/message";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import { useRouter } from "next/navigation";
@@ -46,7 +43,7 @@ export default function Messages() {
         );
         setMessages(fetchedMessages);
       } catch (error) {
-        toast.error("Failed to load messages");
+        toast.error("Không thể tải tin nhắn");
         console.error("Error fetching messages:", error);
       }
     };
@@ -61,6 +58,7 @@ export default function Messages() {
       setUserSearch(data)
     }).catch((e) =>{
       console.error("lỗi khi lấy danh sách userSearch: ", e);
+      toast.error("Không thể tìm kiếm người dùng");
     });
   }
 
@@ -69,6 +67,7 @@ export default function Messages() {
       setroomsearch(data)
     }).catch((e)=>{
       console.error("lỗi khi lấy danh sách roomsearch: ", e);
+      toast.error("Không thể tìm kiếm phòng");
     });
   }
 
@@ -96,7 +95,7 @@ export default function Messages() {
     e.preventDefault();
 
     if (!userId) {
-      alert("Bạn chưa đăng nhập!");
+      toast.error("Bạn chưa đăng nhập!");
       return;
     }
     const newmessage: MessageRequest = {
@@ -108,11 +107,17 @@ export default function Messages() {
     console.error(newmessage);
     try {
       await createmessage(newmessage);
-      alert("Tin nhắn đã được gửi");
+      toast.success("Tin nhắn đã được gửi thành công!");
       setShowForm(false);
+      // Reset form data
+      setFormData({
+        title: "",
+        content: "",
+        receivers: [],
+      });
     } catch (e) {
       console.error("Lỗi:", e);
-      alert("Gửi tin nhắn thất bại!");
+      toast.error("Gửi tin nhắn thất bại!");
     }
   };
 
@@ -175,12 +180,12 @@ export default function Messages() {
                 }`}
         onClick={()=> setShowForm(true)}
         >
-          <span>Compose</span>
+          <span>Tạo mới</span>
         </button>
         <div className="flex items-center space-x-2">
           <ChevronLeftIcon className="w-5 h-5 text-gray-600" />
           <ChevronRightIcon className="w-5 h-5 text-gray-600" />
-          <span className="text-gray-600">Show 1–10 of 10</span>
+          <span className="text-gray-600">Hiển thị 1–10 trên 10</span>
         </div>
       </div>
 
@@ -196,7 +201,7 @@ export default function Messages() {
                 context?.setUnreadCount((prev) => prev - 1);
               } catch (error) {
                 console.error("Error marking message as read:", error);
-                toast.error("Failed to mark message as read");
+                toast.error("Không thể đánh dấu tin nhắn đã đọc");
               }
             }
           };
