@@ -40,6 +40,7 @@ import { PenSquare, Trash2 } from "lucide-react";
 import { getReports, updateReportStatus, deleteReport, Report } from "@/services/reportService";
 import { toast } from "react-toastify";
 import AddReportModal from "@/components/report/AddReportModal";
+import authService from "@/services/authService";
 
 export default function Reports() {
   const [reports, setReports] = useState<Report[]>([]);
@@ -50,6 +51,12 @@ export default function Reports() {
   const [isAddOpen, setIsAddOpen] = useState(false);
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedReport, setSelectedReport] = useState<Report | null>(null);
+  const [userRole, setUserRole] = useState<string>('');
+
+  useEffect(() => {
+    const role = authService.getRole();
+    setUserRole(role || 'STUDENT');
+  }, []);
 
   // Fetch reports từ API
   useEffect(() => {
@@ -123,6 +130,7 @@ export default function Reports() {
     setSelectedReport(report);
     setIsEditOpen(true);
   };
+
 
   const handleUpdateStatus = async (newStatus: string) => {
     if (!selectedReport) return;
@@ -262,26 +270,42 @@ export default function Reports() {
                 </span>
               </TableCell>
               <TableCell>{formatSentDate(report.sentDate)}</TableCell>
-              <TableCell>
+                <TableCell>
                 <div className="flex gap-3">
+                  {userRole === 'STUDENT' ? (
                   <Button
+                    size="icon"
+                    className="h-10 w-10 bg-lightinfo text-info hover:bg-info hover:text-white transition-colors"
+                    onClick={() => handleEditReport(report)}
+                    title="Xem chi tiết"
+                  >
+                    <svg className="h-6 w-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  </Button>
+                  ) : (
+                  <>
+                    <Button
                     size="icon"
                     className="h-10 w-10 bg-lightsuccess text-success hover:bg-success hover:text-white transition-colors"
                     onClick={() => handleEditReport(report)}
                     title="Chỉnh sửa"
-                  >
+                    >
                     <PenSquare className="h-6 w-6" />
-                  </Button>
-                  <Button
+                    </Button>
+                    <Button
                     size="icon"
                     className="h-10 w-10 bg-lighterror text-error hover:bg-error hover:text-white transition-colors"
                     onClick={() => handleDelete(report.id)}
                     title="Xóa báo cáo"
-                  >
+                    >
                     <Trash2 className="h-6 w-6" />
-                  </Button>
+                    </Button>
+                  </>
+                  )}
                 </div>
-              </TableCell>
+                </TableCell>
             </TableRow>
           ))}
         </TableBody>
@@ -479,22 +503,32 @@ export default function Reports() {
               />
             </svg>
           </span>
-          <div className="flex-1">
+            <div className="flex-1">
             <p className="text-sm text-gray-500">Trạng thái</p>
-            <Select
+            {userRole === 'STUDENT' ? (
+              <span className="text-gray-900 font-medium">
+                {selectedReport.status.toLowerCase() === "resolved"
+                  ? "Đã xử lý"
+                  : selectedReport.status.toLowerCase() === "pending"
+                  ? "Chờ xử lý"
+                  : "Đang xử lý"}
+              </span>
+            ) : (
+              <Select
               value={selectedReport.status}
               onValueChange={(value) => handleUpdateStatus(value)}
-            >
+              >
               <SelectTrigger className="col-span-3">
-                    <SelectValue placeholder="Chọn trạng thái" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="PENDING">Chờ xử lý</SelectItem>
-                    <SelectItem value="INPROGRESS">Đang xử lý</SelectItem>
-                    <SelectItem value="RESOLVED">Đã xử lý</SelectItem>
-                  </SelectContent>
-            </Select>
-          </div>
+                  <SelectValue placeholder="Chọn trạng thái" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="PENDING">Chờ xử lý</SelectItem>
+                  <SelectItem value="INPROGRESS">Đang xử lý</SelectItem>
+                  <SelectItem value="RESOLVED">Đã xử lý</SelectItem>
+                </SelectContent>
+              </Select>
+            )}
+            </div>
         </div>
       </div>
     </DialogContent>

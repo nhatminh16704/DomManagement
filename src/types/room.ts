@@ -47,8 +47,9 @@ export interface RoomBill {
   status: "PAID" | "UNPAID" | "PENDING";
 };
 
-export interface requestBill {
-  amount : number,
-  bankCode : string,
-  idRef : number
-}
+export type roomRentalRequest = {
+  roomId: number;
+  price: number;
+};
+
+

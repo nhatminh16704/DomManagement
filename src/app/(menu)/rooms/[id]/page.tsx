@@ -16,7 +16,8 @@ import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
 import {getRoomDetail } from "@/services/roomService";
 
 import authService from "@/services/authService";
-import { payment, registrationRoom } from "@/services/roomrentalService";
+import { registrationRoom } from "@/services/roomrentalService";
+import { payment } from "@/services/paymentService";
 import { CheckCircleIcon, XCircleIcon } from "@heroicons/react/24/outline";
 import {
   Dialog,
@@ -34,17 +35,8 @@ import {updateDeviceQuantity, deleteDeviceRoom, getDevices, addDeviceToRoom } fr
 import { Device, DeviceRoom } from "@/types/room";
 import { RoomDetail } from "@/types/room";
 import { Student } from "@/types/user";
-
-export type roomRentalRequest = {
-  roomId: number;
-  price: number;
-  accountId: number;
-};
-export type PaymentRequest = {
-  amount: number;
-  bankCode: string;
-  idRef: number;
-};
+import { PaymentRequest } from "@/types/payment";
+import { roomRentalRequest } from "@/types/room";
 
 
 export default function RoomDetailPage() {
@@ -251,20 +243,29 @@ export default function RoomDetailPage() {
       const request: roomRentalRequest = {
         roomId: room.id,
         price: room.price,
-        accountId: userId,
       };
-      console.log(request);
 
       try {
         const registId = await registrationRoom(request);
         if (registId != null) {
           if (!isNaN(Number(registId))) {
+            const currentMonth = new Date().getMonth() + 1; // getMonth() returns 0-11, so add 1
+            let multiplier = 5; // default multiplier
+
+            if (currentMonth < 6) {
+              multiplier = 5;
+            } else if (currentMonth < 8) {
+              multiplier = 2;
+            } else {
+              multiplier = 5;
+            }
+
             const paymentRequest: PaymentRequest = {
-              amount: room.price * 6,
+              amount: room.price * multiplier,
               bankCode: "NCB",
               idRef: Number(registId),
             };
-            const path = await payment(paymentRequest);
+            const path = await payment(paymentRequest, "room-rental");
             if (path.startsWith("http")) {
               window.location.href = path;
               setErrorMessage(null);
@@ -288,7 +289,8 @@ export default function RoomDetailPage() {
           }
         }
       } catch (error) {
-        console.error("Lỗi khi đăng ký phòng:", error);
+        toast.error(error instanceof Error ? error.message : "Lỗi khi xử lý yêu cầu");
+        setRegist(false);
       }
     }
   };

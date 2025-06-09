@@ -34,7 +34,7 @@ const Header = () => {
               <ChatBubbleLeftIcon className="w-[30px] h-[30px] text-gray-600 hover:text-blue-600" />
               </div>
             </Link>
-            <Link href="/announcements" className="block">
+            <Link href="/notifications" className="block">
               <div className="bg-white p-2 rounded w-15 h-15 flex items-center justify-center cursor-pointer relative hover:bg-blue-100 hover:shadow-md transition-all duration-200">
               <MegaphoneIcon className="w-[30px] h-[30px] text-gray-600 hover:text-blue-600" />
               </div>

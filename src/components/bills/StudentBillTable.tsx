@@ -9,12 +9,14 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { useRouter, useSearchParams } from 'next/navigation';
+import { RoomBill } from "@/types/room";
 
 import React, { useEffect, useState } from 'react';
-import { getStudentBills, payBill, RoomBill } from '@/services/billService';
+import { getStudentBills } from '@/services/billService';
 import { Badge } from '@/components/ui/badge';
 import { toast } from 'react-toastify';
-import { requestBill } from '@/services/billService'
+import { PaymentRequest } from '@/types/payment';
+import { payment } from "@/services/paymentService";
 export default function StudentBillTable() {
   const [bills, setBills] = useState<RoomBill[]>([]);
 
@@ -42,12 +44,12 @@ export default function StudentBillTable() {
     try {
       const item = bills.find((n) => n.id === bill);
       if (item != null) {
-        const billRequest: requestBill = {
+        const billRequest: PaymentRequest = {
           amount: item.totalAmount,
           bankCode: "NCB",
           idRef: item?.id
         }
-        const path = await payBill(billRequest);
+        const path = await payment(billRequest, "bill-payment");
         console.log(path);
         if (path.startsWith("http")) {
           window.location.href = path;
@@ -81,7 +83,7 @@ export default function StudentBillTable() {
     <div className="overflow-x-auto">
       <h2 className="text-2xl font-bold mb-4">Hóa đơn phòng</h2>
       <Table>
-        <TableCaption>List of all bills</TableCaption>
+        <TableCaption>Danh sách hoá đơn</TableCaption>
         <TableHeader>
           <TableRow>
             <TableHead>Phòng</TableHead>

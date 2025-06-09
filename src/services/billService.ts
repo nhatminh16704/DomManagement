@@ -1,4 +1,5 @@
-import { RoomBill, requestBill } from "@/types/room";
+import { RoomBill } from "@/types/room";
+import { requestBill } from "@/types/payment";
 import { ApiResponse } from "@/types/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/room-bills";
@@ -110,27 +111,3 @@ export const getStudentBills = async (): Promise<RoomBill[]> => {
     throw error;
   }
 };
-
-export async function payBill(billRequest: requestBill): Promise<string> {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(process.env.NEXT_PUBLIC_API_URL +'/vnpay/createBillPayment', {
-      method: "POST",
-      headers: { 
-          "Authorization": `Bearer ${token}`,
-          "Content-Type": "application/json" 
-      },
-      body: JSON.stringify(billRequest),
-    });
-    
-    if (!response.ok) {
-      const errorMessage = await response.text(); 
-      return errorMessage; 
-    }
-    
-    return await response.text();
-  } catch (error) {
-    console.error(error);
-    throw error;
-  }
-}
