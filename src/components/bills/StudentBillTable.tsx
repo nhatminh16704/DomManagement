@@ -84,12 +84,12 @@ export default function StudentBillTable() {
         <TableCaption>List of all bills</TableCaption>
         <TableHeader>
           <TableRow>
-            <TableHead>Room</TableHead>
-            <TableHead>Bill Month</TableHead>
-            <TableHead>Electricity Start</TableHead>
-            <TableHead>Electricity End</TableHead>
-            <TableHead>Total Amount</TableHead>
-            <TableHead>Status</TableHead>
+            <TableHead>Phòng</TableHead>
+            <TableHead>Tháng</TableHead>
+            <TableHead>Số điện đầu</TableHead>
+            <TableHead>Số điện cuối</TableHead>
+            <TableHead>Tổng tiền</TableHead>
+            <TableHead>Trạng thái</TableHead>
             <TableHead>Hành động</TableHead>
           </TableRow>
         </TableHeader>
@@ -125,7 +125,11 @@ export default function StudentBillTable() {
                         : "bg-red-500 hover:bg-red-600 text-white"
                   }
                 >
-                  {bill.status}
+                  {bill.status === "PAID"
+                        ? "Đã thanh toán"
+                        : bill.status === "PENDING"
+                        ? "Chưa cập nhật"
+                        : "Chưa thanh toán"}
                 </Badge>
               </TableCell>
               <TableCell>

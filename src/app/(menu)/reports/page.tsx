@@ -171,7 +171,7 @@ export default function Reports() {
           onClick={() => handleFilterByStatus(null)}
         >
           <div className="text-center">
-            <div className="text-sm font-bold text-info mb-2">Tấc cả</div>
+            <div className="text-sm font-bold text-info mb-2">Tất cả</div>
             <p className="text-3xl font-bold text-info">{stats.totalReports}</p>
           </div>
         </div>
@@ -254,7 +254,11 @@ export default function Reports() {
                       : "bg-warning/20 text-warning border border-warning/30"
                   }`}
                 >
-                  {report.status}
+                  {report.status.toLowerCase() === "resolved"
+                      ? "Đã xử lý"
+                      : report.status.toLowerCase() === "pending"
+                      ? "Chưa xử lý"
+                      : "Đang xử lý"}
                 </span>
               </TableCell>
               <TableCell>{formatSentDate(report.sentDate)}</TableCell>
@@ -485,9 +489,9 @@ export default function Reports() {
                     <SelectValue placeholder="Chọn trạng thái" />
                   </SelectTrigger>
                   <SelectContent>
-                    <SelectItem value="PENDING">Pending</SelectItem>
-                    <SelectItem value="INPROGRESS">In Progress</SelectItem>
-                    <SelectItem value="RESOLVED">Resolved</SelectItem>
+                    <SelectItem value="PENDING">Chờ xử lý</SelectItem>
+                    <SelectItem value="INPROGRESS">Đang xử lý</SelectItem>
+                    <SelectItem value="RESOLVED">Đã xử lý</SelectItem>
                   </SelectContent>
             </Select>
           </div>

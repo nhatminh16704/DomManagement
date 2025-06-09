@@ -192,7 +192,11 @@ export default function AdminBillTable() {
                         : "bg-red-500 hover:bg-red-600 text-white"
                     }
                   >
-                    {bill.status}
+                    {bill.status === "PAID"
+                        ? "Đã thanh toán"
+                        : bill.status === "PENDING"
+                        ? "Chưa cập nhật"
+                        : "Chưa thanh toán"}
                   </Badge>
                 </TableCell>
               </TableRow>

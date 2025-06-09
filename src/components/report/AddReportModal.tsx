@@ -29,7 +29,7 @@ export default function AddReportModal({
   const handleSubmit = async () => {
     try {
       const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports/create`, {
+      const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/reports`, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -38,8 +38,7 @@ export default function AddReportModal({
         body: JSON.stringify({
           title,
           content,
-          sentDate: new Date().toISOString(), // Thời gian hiện tại
-          status: "PENDING", // Mặc định PENDING
+
         }),
       });
       if (!response.ok) {

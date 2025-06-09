@@ -73,7 +73,6 @@ export default function Announcements() {
       title: formData.title,
       content: formData.content,
       type: formData.type,
-      createdBy: userId,
     };
 
     try {

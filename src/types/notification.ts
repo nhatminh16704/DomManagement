@@ -9,7 +9,7 @@ export interface Notification {
 }
 
 export interface createNotification{
-  createdBy: number;
+  // createdBy: number;
   title: string;
   content: string;
   type: string;
