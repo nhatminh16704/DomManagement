@@ -1,28 +1,8 @@
 // services/roomService.ts
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/rooms";
-import { Student } from "@/services/studentService";
-export interface Room {
-  id: number;
-  roomName: string;        
-  price: number;        
-  blockType: string;     
-  typeRoom: string;    
-  maxStudents: number;
-  available: number;
-  // Add your new fields here
-}
+import { Room, RoomDetail } from "@/types/room";
+import { ApiResponse } from "@/types/api";
 
-export interface Device {
-  deviceName: string;
-  quantity: number;
-}
-export interface RoomDetail extends Room {
-  students: Student[];
-  devices: Device[];
-}
-
-
-// Hàm lấy dữ liệu phòng từ API
 export const getRooms = async (): Promise<Room[]> => {
   try {
     const token = localStorage.getItem('token');
@@ -35,22 +15,21 @@ export const getRooms = async (): Promise<Room[]> => {
       headers['Authorization'] = `Bearer ${token}`;
     }
 
-    const response = await fetch(API_URL + "/findAll", {
+    const response = await fetch(API_URL, {
       headers
     });
 
     if (!response.ok) {
       throw new Error("Lỗi khi lấy dữ liệu phòng");
     }
-    const data = await response.json();
+    const data: ApiResponse<Room[]> = await response.json();
 
-    return data;
+    return data.data || [];
   } catch (error) {
     console.error("Lỗi khi fetch dữ liệu phòng:", error);
     return [];
   }
 };
-
 
 export const getRoomDetail = async (roomId: number): Promise<RoomDetail | null> => {
   try {
@@ -72,8 +51,8 @@ export const getRoomDetail = async (roomId: number): Promise<RoomDetail | null> 
       throw new Error("Lỗi khi lấy chi tiết phòng");
     }
     
-    const data = await response.json();
-    return data;
+    const data: ApiResponse<RoomDetail> = await response.json();
+    return data.data || null;
   } catch (error) {
     console.error("Lỗi khi fetch chi tiết phòng:", error);
     return null;

@@ -20,9 +20,17 @@ export interface Room {
 }
 
 export interface Device {
+  id: number;
   deviceName: string;
   quantity: number;
 }
+
+export interface DeviceRoom {
+  roomId: number;
+  deviceId: number;
+  newQuantity: number;
+}
+
 export interface RoomDetail extends Room {
   students: Student[];
   devices: Device[];

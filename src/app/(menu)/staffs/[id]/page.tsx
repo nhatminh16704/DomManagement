@@ -4,7 +4,8 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Calendar, Mail, MapPin, Phone, User } from "lucide-react"; 
 import { useParams } from "next/navigation";
-import { getStaffById, Staff } from "@/services/staffService";
+import { getStaffById } from "@/services/staffService";
+import { Staff } from "@/types/user";
 import { useEffect, useState } from "react";
 
 export default function StaffProfilePage() {
@@ -27,7 +28,7 @@ export default function StaffProfilePage() {
     fetchStaffData();
   }, [id]);
 
-  const fullName = staff ? `${staff.lastName} ${staff.firstName}` : "";
+  const fullName = staff ? staff.fullName : "";
 
   return (
     <div className="bg-gray-100 p-4 flex flex-col items-center">

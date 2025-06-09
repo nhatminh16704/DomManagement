@@ -22,11 +22,10 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { getStaffs, deleteStaff, Staff } from "@/services/staffService";
+import { getStaffs } from "@/services/staffService";
+import { Staff } from "@/types/user";
 import { Eye, Trash2, PenSquare } from "lucide-react";
 import AddStaffModal from "@/components/staff/AddStaffModal";
-import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
-import { toast } from "react-toastify";
 import { formatDate } from "@/lib/utils";
 
 console.log("tesst");
@@ -52,7 +51,7 @@ export default function Staffs() {
   };
 
   const filteredStaffs = staffs.filter((staff) => {
-    const fullName = `${staff.firstName} ${staff.lastName}`.toLowerCase();
+    const fullName = `${staff.fullName}`.toLowerCase();
     const normalizedSearchTerm = searchTerm.toLowerCase();
     return fullName.includes(normalizedSearchTerm);
   });
@@ -93,18 +92,7 @@ export default function Staffs() {
     setSelectedStaff(staff);
   };
 
-  const handleDelete = async () => {
-    if (!selectedStaffId) return;
 
-    try {
-      await deleteStaff(selectedStaffId);
-      toast.success("Deleted successfully!");
-      refreshStaffs();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : String(error));
-    }
-    setIsConfirmOpen(false);
-  };
 
   const [selectedStaffId, setSelectedStaffId] = useState<number | null>(null);
   const openConfirmModal = (staffId: number) => {
@@ -120,24 +108,18 @@ export default function Staffs() {
         </h1>
 
         <div className="flex items-center gap-4">
-          <Button
+            <Button
             className="bg-colorprimary hover:bg-colorprimary/90 text-white"
             onClick={handleAddStaff}
-          >
+            >
             Thêm nhân viên
-          </Button>
-          <AddStaffModal
+            </Button>
+            <AddStaffModal
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             onStaffAdded={refreshStaffs}
             staff={selectedStaff}
-          />
-          <ConfirmDialog
-            isOpen={isConfirmOpen}
-            onClose={() => setIsConfirmOpen(false)}
-            message="Are you sure you want to delete this staff?"
-            onConfirm={handleDelete}
-          />
+            />
           <div className="hidden md:flex items-center gap-2 text-sm rounded-full ring-[1.5px] ring-gray-300 px-3 py-1 transition-all hover:ring-gray-400 hover:ring-2 focus-within:ring-colorprimary focus-within:ring-2 group">
             <Image
               src="/search.png"
@@ -173,7 +155,7 @@ export default function Staffs() {
         <TableBody>
           {currentStaffs.map((staff) => (
             <TableRow key={staff.id}>
-              <TableCell>{`${staff.lastName} ${staff.firstName}`}</TableCell>
+              <TableCell>{staff.fullName}</TableCell>
               <TableCell>{formatDate(staff.birthday)}</TableCell>
               <TableCell>{staff.gender}</TableCell>
               <TableCell>{staff.position}</TableCell>
@@ -197,14 +179,6 @@ export default function Staffs() {
                     title="Xem chi tiết"
                   >
                     <Eye className="h-6 w-6" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    className="h-10 w-10 bg-lighterror text-error hover:bg-error hover:text-white transition-colors"
-                    onClick={() => openConfirmModal(staff.id)}
-                    title="Xóa nhân viên"
-                  >
-                    <Trash2 className="h-6 w-6" />
                   </Button>
                 </div>
               </TableCell>

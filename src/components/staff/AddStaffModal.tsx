@@ -23,13 +23,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createStaff, updateStaff, Staff } from "@/services/staffService";
+import { createStaff, updateStaff } from "@/services/staffService";
+import { Staff } from "@/types/user";
 
 // Định nghĩa schema validation với Zod cho Staff
 const staffSchema = z.object({
   id: z.number().optional(),
-  firstName: z.string().min(1, "Tên phải có ít nhất 1 ký tự"),
-  lastName: z.string().min(1, "Họ phải có ít nhất 1 ký tự"),
+  fullName: z.string().min(1, "Tên phải có ít nhất 1 ký tự"),
   email: z.string().email("Email không hợp lệ"),
   birthday: z.string().nonempty("Vui lòng chọn ngày sinh"),
   gender: z.string().nonempty("Vui lòng chọn giới tính"),
@@ -67,8 +67,7 @@ export default function AddStaffModal({
   } = useForm<StaffFormData>({
     resolver: zodResolver(staffSchema),
     defaultValues: {
-      firstName: "",
-      lastName: "",
+      fullName: "",
       birthday: "",
       gender: "",
       position: "",
@@ -86,8 +85,7 @@ export default function AddStaffModal({
       staff
         ? { ...staff }
         : {
-            firstName: "",
-            lastName: "",
+            fullName: "",
             birthday: "",
             gender: "",
             position: "",
@@ -101,19 +99,19 @@ export default function AddStaffModal({
 
   const onSubmit = async (data: StaffFormData) => {
     try {
-      let message = "";
       if (data.id) {
-        message = await updateStaff(data.id, data as Staff);
+        await updateStaff(data.id, data as Staff);
+        toast.success("Cập nhật nhân viên thành công");
       } else {
-        message = await createStaff(data);
+        await createStaff(data);
+        toast.success("Thêm nhân viên thành công");
       }
 
-      toast.success(`${message}`);
       onClose();
       onStaffAdded();
       reset();
     } catch (error) {
-      toast.error(`${error}`);
+      toast.error(error instanceof Error ? error.message : "Lỗi khi xử lý yêu cầu");
     }
   };
 
@@ -131,32 +129,17 @@ export default function AddStaffModal({
         <form onSubmit={handleSubmit(onSubmit)}>
           <div className="grid grid-cols-2 gap-4 py-4">
             <div className="space-y-2">
-              <Label htmlFor="firstName">Tên</Label>
+              <Label htmlFor="firstName">Họ và tên</Label>
               <Input
-                id="firstName"
-                {...register("firstName")}
+                id="fullName"
+                {...register("fullName")}
                 className={`focus-visible:ring-blue-500 ${
-                  errors.firstName ? "border-red-500" : ""
+                  errors.fullName ? "border-red-500" : ""
                 }`}
               />
-              {errors.firstName && (
+              {errors.fullName && (
                 <p className="text-red-500 text-xs mt-1">
-                  {errors.firstName.message}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <Label htmlFor="lastName">Họ</Label>
-              <Input
-                id="lastName"
-                {...register("lastName")}
-                className={`focus-visible:ring-blue-500 ${
-                  errors.lastName ? "border-red-500" : ""
-                }`}
-              />
-              {errors.lastName && (
-                <p className="text-red-500 text-xs mt-1">
-                  {errors.lastName.message}
+                  {errors.fullName.message}
                 </p>
               )}
             </div>

@@ -107,14 +107,14 @@ export default function Messages() {
     console.error(newmessage);
     try {
       await createmessage(newmessage);
-      toast.success("Tin nhắn đã được gửi thành công!");
+      toast.success("Tin nhắn đã được gửi");
       setShowForm(false);
-      // Reset form data
-      setFormData({
-        title: "",
-        content: "",
-        receivers: [],
-      });
+      // Refresh messages after sending
+      const fetchedMessages = await getMessages();
+      fetchedMessages.sort(
+        (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()
+      );
+      setMessages(fetchedMessages);
     } catch (e) {
       console.error("Lỗi:", e);
       toast.error("Gửi tin nhắn thất bại!");
@@ -180,7 +180,7 @@ export default function Messages() {
                 }`}
         onClick={()=> setShowForm(true)}
         >
-          <span>Tạo mới</span>
+            <span>Soạn tin nhắn</span>
         </button>
         <div className="flex items-center space-x-2">
           <ChevronLeftIcon className="w-5 h-5 text-gray-600" />

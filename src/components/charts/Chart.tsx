@@ -1,19 +1,36 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Chart from "react-apexcharts";
+import { getMonthlyIncome } from "@/services/dashboardService";
 
 const RevenueChart: React.FC = () => {
   const [period, setPeriod] = useState<string>("first-half");
+  const [monthlyIncome, setMonthlyIncome] = useState<number[]>([]);
 
+  useEffect(() => {
+    const fetchMonthlyIncome = async () => {
+      try {
+        const data = await getMonthlyIncome();
+        setMonthlyIncome(data);
+      } catch (error) {
+        console.error("Error fetching monthly income:", error);
+      }
+    };
+    fetchMonthlyIncome();
+  }, []);
+
+  // Transform monthly income data (divide by 100 million and multiply by 4)
+  const transformedData = monthlyIncome.map(income => Number(((income / 100000000) * 4).toFixed(3)));
+  
   const periodData = {
     "first-half": {
       categories: ["Thg 1", "Thg 2", "Thg 3", "Thg 4", "Thg 5", "Thg 6"],
-      data: [1.5, 2.8, 2.1, 3.5, 1.2, 0.8]
+      data: transformedData.slice(0, 6)
     },
     "second-half": {
       categories: ["Thg 7", "Thg 8", "Thg 9", "Thg 10", "Thg 11", "Thg 12"],
-      data: [0.9, 1.8, 2.7, 3.2, 2.5, 3.9]
+      data: transformedData.slice(6, 12)
     }
   };
 
@@ -84,13 +101,17 @@ const RevenueChart: React.FC = () => {
               <span className="block w-5 h-5 bg-blue-500 rounded-md"></span>
             </div>
             <div>
-              <p className="text-2xl font-bold text-blue-700">636,49 tr</p>
+                <p className="text-2xl font-bold text-blue-700">
+                {(monthlyIncome.reduce((sum, income) => sum + income, 0) / 1000000).toFixed(2)} tr
+                </p>
               <p className="text-sm text-gray-500">Tổng Thu</p>
             </div>
           </div>
           <div className="p-3 bg-indigo-50 rounded-xl">
             <p className="text-sm text-gray-500">Tổng thu tháng này</p>
-            <p className="text-xl font-semibold text-indigo-600">48,820 tr</p>
+            <p className="text-xl font-semibold text-indigo-600">
+              {(monthlyIncome[new Date().getMonth()] / 1000000).toFixed(2)} tr
+            </p>
           </div>
         </div>
       </div>

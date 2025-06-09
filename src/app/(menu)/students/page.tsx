@@ -23,12 +23,11 @@ import {
 } from "@/components/ui/pagination";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
-import { getStudents, deleteStudent, Student } from "@/services/studentService";
-import { Eye, Trash2, PenSquare, AlertTriangle } from "lucide-react";
+import { getStudents} from "@/services/studentService";
+import { Student } from "@/types/user";
+import { Eye, PenSquare, AlertTriangle } from "lucide-react";
 import AddStudentModal from "@/components/student/AddStudentModal";
 import AddViolationModal from "@/components/student/AddViolationModal";
-import ConfirmDialog from "@/components/Dialog/ConfirmDialog";
-import { toast } from "react-toastify";
 import { formatDate } from "@/lib/utils";
 
 export default function Students() {
@@ -38,7 +37,6 @@ export default function Students() {
   const [currentPage, setCurrentPage] = useState(1);
   const studentsPerPage = 8;
   const [isOpen, setIsOpen] = useState(false); // Modal thêm/sửa sinh viên
-  const [isConfirmOpen, setIsConfirmOpen] = useState(false); // Dialog xác nhận xóa
   const [isViolationOpen, setIsViolationOpen] = useState(false); // Modal tạo vi phạm
   const [selectedStudent, setSelectedStudent] = useState<Student | undefined>();
   const [selectedStudentId, setSelectedStudentId] = useState<number | null>(null);
@@ -98,23 +96,6 @@ export default function Students() {
     setSelectedStudent(student);
   };
 
-  const handleDelete = async () => {
-    if (!selectedStudentId) return;
-
-    try {
-      await deleteStudent(selectedStudentId);
-      toast.success("Deleted successfully!");
-      refreshStudents();
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : String(error));
-    }
-    setIsConfirmOpen(false);
-  };
-
-  const openConfirmModal = (studentId: number) => {
-    setSelectedStudentId(studentId);
-    setIsConfirmOpen(true);
-  };
 
   const openViolationModal = (studentId: number) => {
     setSelectedStudentId(studentId);
@@ -129,30 +110,25 @@ export default function Students() {
         </h1>
 
         <div className="flex items-center gap-4">
-          <Button
+            <Button
             className="bg-colorprimary hover:bg-colorprimary/90 text-white"
             onClick={handleAddStudent}
-          >
+            >
             Thêm sinh viên
-          </Button>
-          <AddStudentModal
+            </Button>
+            <AddStudentModal
             isOpen={isOpen}
             onClose={() => setIsOpen(false)}
             onStudentAdded={refreshStudents}
             student={selectedStudent}
-          />
-          <AddViolationModal
+            />
+            <AddViolationModal
             isOpen={isViolationOpen}
             onClose={() => setIsViolationOpen(false)}
             studentId={selectedStudentId!}
             onViolationAdded={refreshStudents}
-          />
-          <ConfirmDialog
-            isOpen={isConfirmOpen}
-            onClose={() => setIsConfirmOpen(false)}
-            message="Are you sure you want to delete this student?"
-            onConfirm={handleDelete}
-          />
+            />
+
           <div className="hidden md:flex items-center gap-2 text-sm rounded-full ring-[1.5px] ring-gray-300 px-3 py-1 transition-all hover:ring-gray-400 hover:ring-2 focus-within:ring-colorprimary focus-within:ring-2 group">
             <Image
               src="/search.png"
@@ -220,14 +196,6 @@ export default function Students() {
                     title="Thêm vi phạm"
                   >
                     <AlertTriangle className="h-6 w-6" />
-                  </Button>
-                  <Button
-                    size="icon"
-                    className="h-10 w-10 bg-lighterror text-error hover:bg-error hover:text-white transition-colors"
-                    onClick={() => openConfirmModal(student.id)}
-                    title="Xóa sinh viên"
-                  >
-                    <Trash2 className="h-6 w-6" />
                   </Button>
                 </div>
               </TableCell>

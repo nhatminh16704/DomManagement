@@ -1,3 +1,4 @@
+import { ApiResponse } from "@/types/api";
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/reports";
 
 export interface Report {
@@ -16,7 +17,7 @@ export interface Report {
 export async function getReports(): Promise<Report[]> {
   try {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const response = await fetch(`${API_URL}/findAll`, {
+    const response = await fetch(`${API_URL}`, {
       headers: {
         "Authorization": `Bearer ${token || ""}`,
       },
@@ -24,7 +25,8 @@ export async function getReports(): Promise<Report[]> {
     if (!response.ok) {
       throw new Error(`Lỗi khi lấy danh sách báo cáo: ${response.status}`);
     }
-    return await response.json();
+    const apiResponse: ApiResponse<Report[]> = await response.json();
+    return apiResponse.data;
   } catch (error) {
     console.error("Error fetching reports:", error);
     throw error;
@@ -34,18 +36,19 @@ export async function getReports(): Promise<Report[]> {
 export async function updateReportStatus(id: number, status: string): Promise<string> {
   try {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const response = await fetch(`${API_URL}/update/${id}`, {
+    const response = await fetch(`${API_URL}/${id}`, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",
         "Authorization": `Bearer ${token || ""}`,
       },
-      body: JSON.stringify({ status }), // Gửi nguyên Report không cần thiết, chỉ gửi status
+      body: JSON.stringify({ status }),
     });
     if (!response.ok) {
       throw new Error(`Lỗi khi cập nhật trạng thái: ${response.status}`);
     }
-    return await response.text();
+    const apiResponse: ApiResponse<string> = await response.json();
+    return apiResponse.data;
   } catch (error) {
     console.error("Error updating report:", error);
     throw error;
@@ -55,7 +58,7 @@ export async function updateReportStatus(id: number, status: string): Promise<st
 export async function deleteReport(id: number): Promise<string> {
   try {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const response = await fetch(`${API_URL}/delete/${id}`, {
+    const response = await fetch(`${API_URL}/${id}`, {
       method: "DELETE",
       headers: {
         "Authorization": `Bearer ${token || ""}`,
@@ -64,7 +67,8 @@ export async function deleteReport(id: number): Promise<string> {
     if (!response.ok) {
       throw new Error(`Lỗi khi xóa báo cáo: ${response.status}`);
     }
-    return await response.text();
+    const apiResponse: ApiResponse<string> = await response.json();
+    return apiResponse.data;
   } catch (error) {
     console.error("Error deleting report:", error);
     throw error;
@@ -82,7 +86,7 @@ export async function createReport({
 }): Promise<string> {
   try {
     const token = typeof window !== "undefined" ? localStorage.getItem("token") : null;
-    const response = await fetch(`${API_URL}/create`, {
+    const response = await fetch(`${API_URL}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -99,7 +103,8 @@ export async function createReport({
       throw new Error(`Lỗi khi tạo báo cáo: ${response.status}`);
     }
 
-    return await response.text(); // giả sử backend trả về chuỗi thông báo thành công
+    const apiResponse: ApiResponse<string> = await response.json();
+    return apiResponse.data;
   } catch (error) {
     console.error("Error creating report:", error);
     throw error;

@@ -118,7 +118,7 @@ const menuItems = [
 ];
 
 
-const Menu = ({ numberMessage }: { numberMessage: number }) => {
+const Menu = () => {
   const pathname = usePathname();
   const context = useContext(UnreadMessagesContext);
   const unreadCount = context?.unreadCount || 0;

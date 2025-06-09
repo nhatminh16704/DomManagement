@@ -1,35 +1,62 @@
 'use client'
 
 import authService from "./authService";
-import { getStudentProfile, updateStudentProfile, changeStudentPassword } from "./studentService";
-import { getStaffProfile, updateStaffProfile, changeStaffPassword } from "./staffService";
+const API_URL = process.env.NEXT_PUBLIC_API_URL;
+import { getStudentProfile, updateStudentProfile } from "./studentService";
+import { getStaffProfile, updateStaffProfile } from "./staffService";
+import { ApiResponse } from "@/types/api";
 
 export async function getProfile() {
-  const role = authService.getRole();
+  try {
+    const role = authService.getRole();
 
-  if (role === "STUDENT") {
-    return await getStudentProfile();
-  } else {
-    return await getStaffProfile();
+    if (role === "STUDENT") {
+      return await getStudentProfile();
+    } else {
+      return await getStaffProfile();
+    }
+  } catch (error) {
+    throw new Error(`Failed to get profile: ${error instanceof Error ? error.message : 'Unknown error'}`);
   }
 }
 
 export async function updateProfile(data: { email: string; phoneNumber: string }) {
-  const role = authService.getRole();
+  try {
+    const role = authService.getRole();
 
-  if (role === "STUDENT") {
-    await updateStudentProfile(data);
-  } else {
-    await updateStaffProfile(data);
-  } 
+    if (role === "STUDENT") {
+      await updateStudentProfile(data);
+    } else {
+      await updateStaffProfile(data);
+    }
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : String(error));
+  }
 }
 
-export async function changePassword(data: { currentPassword: string; newPassword: string }) {
-  const role = authService.getRole();
+export async function changePassword(data: { currentPassword: string; newPassword: string }): Promise<ApiResponse<string>> {
+  try {
+    const token = localStorage.getItem('token');
+    if (!token) throw new Error("Chưa đăng nhập!");
 
-  if (role === "STUDENT") {
-    await changeStudentPassword(data);
-  } else {
-    await changeStaffPassword(data);
-  } 
+    const response = await fetch(`${API_URL}/auth/password-change`, {
+      method: 'PATCH',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${token}`,
+      },
+      body: JSON.stringify(data),
+    });
+
+    if (!response.ok) {
+      const errorData = await response.json();
+      const errorMessage = errorData.message || await response.text();
+      throw new Error(errorMessage);
+    }
+
+    const apiResponse: ApiResponse<string> = await response.json();
+    return apiResponse;
+  } catch (error) {
+    throw new Error(error instanceof Error ? error.message : String(error));
+  }
 }

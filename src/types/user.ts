@@ -29,8 +29,7 @@ export interface StudentProfile {
 
 export interface Staff {
   id: number;
-  firstName: string;
-  lastName: string;
+  fullName: string;
   birthday: string;
   gender: string;
   address: string;

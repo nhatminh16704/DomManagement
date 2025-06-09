@@ -25,7 +25,8 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { createStudent, updateStudent, Student } from "@/services/studentService";
+import { createStudent, updateStudent } from "@/services/studentService";
+import { Student } from "@/types/user";
 
 //Định nghĩa schema validation với Zod
 const studentSchema = z.object({
@@ -38,7 +39,7 @@ const studentSchema = z.object({
   className: z.string().min(2, "Tên lớp không hợp lệ"),
   phoneNumber: z
     .string()
-    .regex(/^\d{10,}$/, "Số điện thoại phải có ít nhất 10 số"),
+    .regex(/^\d{10,11}$/, "Số điện thoại phải có từ 10-11 số"),
   hometown: z.string().min(3, "Quê quán không hợp lệ"),
 });
 
@@ -101,21 +102,22 @@ export default function AddStudentModal({
 
   const onSubmit = async (data: StudentFormData) => {
     try {  
-      let message = "";
       if (data.id) {
         // Ensure data.id is a number before passing to updateStudent
         // Also, cast data to Student type to satisfy the type requirements
-        message = await updateStudent(data.id, data as Student);
+        await updateStudent(data.id, data as Student);
+        toast.success(`Cập nhật sinh viên thành công`);
       } else {
-        message = await createStudent(data);
+        await createStudent(data);
+        toast.success(`Thêm sinh viên thành công`);
       }
   
-      toast.success(`${message}`);
+      
       onClose();
       onStudentAdded();
       reset();
     } catch (error) {
-      toast.error(`${error}`);
+      toast.error(`Có lỗi xảy ra: ${error instanceof Error ? error.message : "Không rõ"}`);
     }
   };
   

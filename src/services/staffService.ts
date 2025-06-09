@@ -1,25 +1,13 @@
-export type Staff = {
-  id: number;
-  firstName: string;
-  lastName: string;
-  birthday: string;
-  gender: string;
-  address: string;
-  email: string;
-  phoneNumber: string;
-  startDate: string;
-  position: string;
-};
-
+import { Staff } from "@/types/user";
+import { ApiResponse } from "@/types/api";
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL + "/staffs";
-
 
 export async function getStaffs(): Promise<Staff[]> {
   try {
     const token = localStorage.getItem('token');
     console.log(token);
-    const response = await fetch(API_URL + "/findAll", {
+    const response = await fetch(API_URL, {
       headers: {
         'Authorization': `Bearer ${token}`
       }
@@ -27,7 +15,8 @@ export async function getStaffs(): Promise<Staff[]> {
     if (!response.ok) {
       throw new Error("Lỗi khi lấy danh sách nhan viên");
     }
-    return await response.json();
+    const apiResponse: ApiResponse<Staff[]> = await response.json();
+    return apiResponse.data.sort((a, b) => b.id - a.id);
   } catch (error) {
     console.error("Error fetching staff:", error);
     throw error;
@@ -46,7 +35,8 @@ export async function getStaffById(staffId: number): Promise<Staff> {
       const errorMessage = await response.text();
       throw new Error(errorMessage);
     }
-    return await response.json();
+    const apiResponse: ApiResponse<Staff> = await response.json();
+    return apiResponse.data;
   } catch (error) {
     console.error("Error fetching staff:", error);
     throw error;
@@ -68,18 +58,18 @@ export async function getStaffProfile(): Promise<Staff> {
       throw new Error(errorMessage || "Lỗi khi lấy thông tin hồ sơ nhân viên");
     }
 
-    return await response.json();
+    const apiResponse: ApiResponse<Staff> = await response.json();
+    return apiResponse.data;
   } catch (error) {
     console.error("Error fetching staff profile:", error);
     throw error;
   }
 }
 
-
 export async function createStaff(staff: Omit<Staff, 'id'>): Promise<string> {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(API_URL + "/create", {
+    const response = await fetch(API_URL, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -89,11 +79,13 @@ export async function createStaff(staff: Omit<Staff, 'id'>): Promise<string> {
     });
 
     if (!response.ok) {
-      const errorMessage = await response.text();
+      const errorData = await response.json();
+      const errorMessage = errorData.message || await response.text();
       throw new Error(errorMessage);
     }
 
-    return await response.text();
+    const apiResponse: ApiResponse<string> = await response.json();
+    return apiResponse.data;
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : String(error));
   }
@@ -102,7 +94,7 @@ export async function createStaff(staff: Omit<Staff, 'id'>): Promise<string> {
 export async function updateStaff(id: number, staff: Staff): Promise<string> {
   try {
     const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/update/${id}`, {
+    const response = await fetch(`${API_URL}/${id}`, {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
@@ -112,36 +104,19 @@ export async function updateStaff(id: number, staff: Staff): Promise<string> {
     });
 
     if (!response.ok) {
-      const errorMessage = await response.text();
+      const errorData = await response.json();
+      const errorMessage = errorData.message || await response.text();
       throw new Error(errorMessage);
     }
 
-    return await response.text();
+    const apiResponse: ApiResponse<string> = await response.json();
+    return apiResponse.data;
   } catch (error) {
     throw new Error(error instanceof Error ? error.message : String(error));
   }
 }
 
-export async function deleteStaff(id: number): Promise<string> {
-  try {
-    const token = localStorage.getItem('token');
-    const response = await fetch(`${API_URL}/delete/${id}`, {
-      method: 'DELETE',
-      headers: {
-        'Authorization': `Bearer ${token}`
-      }
-    });
 
-    if (!response.ok) {
-      const errorMessage = await response.text();
-      throw new Error(errorMessage);
-    }
-
-    return await response.text();
-  } catch (error) {
-    throw new Error(error instanceof Error ? error.message : String(error));
-  }
-}
 
 export async function updateStaffProfile(data: { email: string; phoneNumber: string }) {
   const token = localStorage.getItem('token');
@@ -160,24 +135,9 @@ export async function updateStaffProfile(data: { email: string; phoneNumber: str
     const errorMessage = await response.text();
     throw new Error(errorMessage || "Lỗi khi cập nhật thông tin nhân viên");
   }
+
+  const apiResponse: ApiResponse<void> = await response.json();
+  return apiResponse.data;
 }
 
-export async function changeStaffPassword(data: { currentPassword: string; newPassword: string }) {
-  const token = localStorage.getItem('token');
-  if (!token) throw new Error("Chưa đăng nhập!");
-
-  const response = await fetch(`${API_URL}/password`, {
-    method: "PUT",
-    headers: {
-      "Content-Type": "application/json",
-      "Authorization": `Bearer ${token}`,
-    },
-    body: JSON.stringify(data),
-  });
-
-  if (!response.ok) {
-    const errorMessage = await response.text();
-    throw new Error(errorMessage || "Lỗi khi đổi mật khẩu nhân viên");
-  }
-}
 
